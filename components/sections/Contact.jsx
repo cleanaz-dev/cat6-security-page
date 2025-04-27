@@ -18,7 +18,8 @@ import {
   numOfCameras,
   projectTypes,
   timeline,
-  cities, // Make sure this is imported from your constants
+  cities,
+  budgets
 } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
@@ -46,6 +47,7 @@ export default function Contact() {
     defaultValues: {
       name: "",
       email: "",
+      budget:"",
       phone: "",
       city: "",
       customCity: "",
@@ -201,7 +203,7 @@ export default function Contact() {
 
                   {watch("city") === "Other" && (
                     <div className="mt-2">
-                      <Label>Specify City*</Label>
+                      <Label>Specify City</Label>
                       <Input
                         {...register("customCity")}
                         placeholder="Enter your city"
@@ -212,6 +214,31 @@ export default function Contact() {
                         </p>
                       )}
                     </div>
+                  )}
+                </div>
+
+                {/* Budget */}
+                <div className="space-y-2">
+                  <Label htmlFor="budget">Budget</Label>
+                  <Select
+                    onValueChange={(value) => setValue("budget", value)}
+                    value={watch("budget")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your budget" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background">
+                      {budgets.map((budget) => (
+                        <SelectItem key={budget.id} value={budget.value}>
+                          {budget.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.budget && (
+                    <p className="text-sm text-rose-500">
+                      {errors.budget.message}
+                    </p>
                   )}
                 </div>
 

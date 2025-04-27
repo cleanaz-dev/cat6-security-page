@@ -10,9 +10,6 @@ export function ThemeProvider({
       attribute="data-theme"
       disableTransitionOnChange
       defaultTheme="system"
-      
-
-
     >
       {children}
     </NextThemesProvider>
