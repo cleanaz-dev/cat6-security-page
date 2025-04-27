@@ -9,7 +9,7 @@ export function ThemeProvider({
     <NextThemesProvider 
       attribute="data-theme"
       disableTransitionOnChange
-      defaultTheme="system"
+      defaultTheme="light"
     >
       {children}
     </NextThemesProvider>

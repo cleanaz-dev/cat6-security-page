@@ -108,7 +108,7 @@ export default function Contact() {
           {/* Left Side Info */}
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+              <h2 className="text-3xl lg:text-6xl font-bold tracking-tighter md:text-4xl/tight">
                 Contact Us
               </h2>
               <p className="max-w-[600px] text-muted md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">

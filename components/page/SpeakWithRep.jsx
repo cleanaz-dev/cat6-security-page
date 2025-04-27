@@ -56,16 +56,16 @@ export default function SpeakWithRep({ contact, project }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-gradient-to-b from-muted to-background flex flex-col">
       <header className="text-center py-4 md:py-8">
-        <h1 className="text-3xl flex gap-2 items-center justify-center">
-          <Shield className="size-8" />{" "}
+        <h1 className="text-3xl lg:text-6xl flex gap-2 items-center justify-center decoration-2 underline decoration-primary">
+          <Shield className="size-8 lg:size-16" />{" "}
           <span className="tracking-widest">Cat6 Security</span>
         </h1>
       </header>
 
       <div className="container mx-auto flex-1">
-        <div className="flex flex-col lg:flex-row items-center gap-12 px-4 py-4 mb-8">
+        <div className="flex flex-col lg:flex-row items-center gap-4 md:gap-12 px-4 py-4 mb-8">
           {/* Left Column - Image */}
           <div className="w-full lg:w-1/2">
             <Image
@@ -116,8 +116,8 @@ export default function SpeakWithRep({ contact, project }) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Select Day</Label>
-                  <div className="flex justify-between gap-2">
+                  <Label>Select Time</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {timeFrames.map((timeFrame, index) => (
                       <Button
                         key={index}
