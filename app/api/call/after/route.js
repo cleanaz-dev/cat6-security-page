@@ -10,6 +10,9 @@ import { randomUUID } from 'crypto';
  * - Call-back scheduling
  * - Follow-up email logic
  */
+
+const baseUrl = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_BASE_URL : process.env.NEXT_PUBLIC_DEV_URL;
+
 export async function POST(req) {
   // Method validation
   if (req.method !== "POST") {
@@ -19,20 +22,11 @@ export async function POST(req) {
     );
   }
 
+  
   try {
     const data = await req.json();
-    
-    if (!data) {
-      return NextResponse.json(
-        { success: false, message: "No data received" },
-        { status: 400 }
-      );
-    }
-
-    console.log("Call completion data received:", data);
-
-    const callAnswered = data.analysis?.didSomeonePickup;
     const redisId = data.metadata?.redisId;
+    const callAnswered = data.analysis?.didSomeonePickup;
 
     if (!redisId) {
       return NextResponse.json(
@@ -41,91 +35,67 @@ export async function POST(req) {
       );
     }
 
-    // Get existing call data
-    const existingCallStr = await redis.get(redisId);
-    if (!existingCallStr) {
-      console.warn(`Call ${redisId} not found in Redis`);
-      return NextResponse.json(
-        { success: false, message: "Call record not found" },
-        { status: 404 }
-      );
-    }
+    console.log("Call completion data received:", data);
 
-    const existingCall = JSON.parse(existingCallStr);
+    const redisKey = `redisId:${redisId}`;
+    const existingCall = JSON.parse(await redis.get(redisKey) || '{}');
     const attempts = (existingCall.attempts || 0) + 1;
 
-    // Handle call outcomes
-    if (callAnswered) {
-      // Successful call - clean up
-      await redis.del(redisId);
-      console.log(`Successfully cleaned up completed call: ${redisId}`);
 
+
+    // Successful call flow
+    if (callAnswered) {
+      if (data.analysis?.discountOfferAccepted) {
+        await sendDiscountEmail(existingCall.formData);
+      }
+
+      await redis.del(redisKey);
       return NextResponse.json({
         success: true,
-        message: "Call completed and cleaned up",
-        callId: redisId,
-        completedAt: new Date().toISOString()
+        message: "Call completed",
+        callId: redisId
       });
-    } else {
-      // Unanswered call - handle retry or follow-up
-      if (attempts >= 3) {
-        // Max attempts reached - send email
-
-            // Generate and store tokens
-    const repToken = randomUUID();
-    const zoomToken = randomUUID();
-    const baseUrl = "https://raccoon-credible-elephant.ngrok-free.app";
-    
-    // Store tokens with expiration (24 hours)
-    await Promise.all([
-      redis.set(`repToken:${repToken}`, JSON.stringify({ formData }), 'EX', 60 * 60 * 24),
-      redis.set(`zoomToken:${zoomToken}`, JSON.stringify({ formData }), 'EX', 60 * 60 * 24)
-    ]);
-
-        await sendFollowUpEmail({
-          to: existingCall.email, 
-          name: existingCall.name,
-          phone: existingCall.phone,
-          repToken,
-          zoomToken,
-          baseUrl
-        });
-        
-        await redis.del(redisId);
-        console.log(`Follow-up email sent for call ${redisId}`);
-
-        return NextResponse.json({
-          success: true,
-          message: "Max attempts reached - follow-up email sent",
-          callId: redisId
-        });
-      } else {
-        // Schedule callback in 5 minutes
-        const callbackTime = new Date(Date.now() + 5 * 60 * 1000);
-        await redis.set(redisId, JSON.stringify({
-          ...existingCall,
-          status: 'call-back',
-          attempts,
-          callTime: callbackTime.toISOString()
-        }));
-
-        console.log(`Scheduled callback for ${redisId} at ${callbackTime}`);
-
-        return NextResponse.json({
-          success: true,
-          message: "Callback scheduled",
-        });
-      }
     }
 
+     // Unanswered call flow
+     if (attempts >= 3) {
+      await sendFollowUpEmail({
+        ...existingCall.formData,
+        baseUrl
+      });
+
+      // Extend expiry for potential re-engagement
+      await redis.set(redisKey, JSON.stringify({
+        ...existingCall,
+        status: 'follow-up-sent',
+        lastAttempt: new Date().toISOString()
+      }), 'EX', 86400); // 24h expiry
+
+      return NextResponse.json({ 
+        success: true,
+        message: "Follow-up sent" 
+      });
+    }
+
+    // Schedule retry
+    const callbackTime = new Date(Date.now() + 5 * 60 * 1000);
+    await redis.set(redisKey, JSON.stringify({
+      ...existingCall,
+      status: 'call-back',
+      attempts,
+      callTime: callbackTime.toISOString()
+    }), 'EX', 86400);
+
+    return NextResponse.json({
+      success: true,
+      nextAttempt: callbackTime,
+      attemptsRemaining: 3 - attempts
+    });
+
   } catch (error) {
-    console.error("Call completion processing error:", error);
+    console.error("Processing error:", error);
     return NextResponse.json(
-      { 
-        success: false, 
-        message: "Error processing call completion",
-        error: process.env.NODE_ENV === "development" ? error.message : undefined
-      },
+      { success: false, message: "Processing failed" },
       { status: 500 }
     );
   }

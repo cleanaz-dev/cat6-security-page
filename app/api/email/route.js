@@ -11,6 +11,7 @@ const limiter = new Bottleneck({
   minTime: 60000, // 1 email per minute
   maxConcurrent: 1,
 });
+const baseUrl = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_BASE_URL : process.env.NEXT_PUBLIC_DEV_URL;
 
 export async function POST(req) {
 
@@ -66,24 +67,18 @@ export async function POST(req) {
       }
     }
 
-    // Generate and store tokens
-    const repToken = randomUUID();
-    const zoomToken = randomUUID();
-    const baseUrl = "https://raccoon-credible-elephant.ngrok-free.app";
-    console.log("repToken:", repToken, "zoomToken:", zoomToken, "baseUrl:", baseUrl);
+
+    const redisId = randomUUID();
+    console.log("baseUrl:", baseUrl);
     
     // Store tokens with expiration (24 hours)
-    await Promise.all([
-      redis.set(`repToken:${repToken}`, JSON.stringify({ formData }), 'EX', 60 * 60 * 24),
-      redis.set(`zoomToken:${zoomToken}`, JSON.stringify({ formData }), 'EX', 60 * 60 * 24)
-    ]);
+    await redis.set(`redisId:${redisId}`, JSON.stringify({ formData }), 'EX', 60 * 60 * 24)
 
     // Send email with rate limiting
     const emailResponse = await limiter.schedule(() => 
       sendContactEmail({
         ...validationResult.data,
-        repToken,
-        zoomToken,
+        redisId,
         baseUrl
       })
     );

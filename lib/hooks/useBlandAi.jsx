@@ -6,7 +6,6 @@ const voiceId = [
   { id: "fc585787-f5a8-4c3d-a16f-759a895c114a", name: "Faye" },
   { id: "6a63d109-aa30-470c-ab56-a4c1447c4a4c", name: "Alex" },
   { id: "923ef241-cffc-4b6d-a59a-9c3ec3614d53", name: "Brady" },
-  { id: "bb93401e-12ea-4d08-8f8b-6d346cb41add", name: "Paige" },
 ];
 
 
@@ -78,6 +77,7 @@ export async function makeCall(data) {
           rescheduledCall: "boolean",
           addtionalInformation: "string",
           bookZoom: "boolean",
+          depositOffer: "boolean",
         },
         webhook:
           "https://raccoon-credible-elephant.ngrok-free.app/api/call/after",

@@ -9,7 +9,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { ThemeChanger } from "@/lib/hooks/useTheme";
 
-export default function SpeakWithRep({ contact, project }) {
+export default function SpeakWithRep({ contact, project, redisId }) {
   const { name, email, phone } = contact;
   const [selectedTime, setSelectedTime] = useState("");
   const [status, setStatus] = useState({
@@ -45,6 +45,7 @@ export default function SpeakWithRep({ contact, project }) {
         body: JSON.stringify({
           ...contact,
           ...project,
+          redisId: redisId,
           selectedTime: parseInt(selectedTime),
         }),
       });
