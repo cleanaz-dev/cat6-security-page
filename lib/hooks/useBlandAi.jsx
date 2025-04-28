@@ -89,7 +89,7 @@ export async function makeCall(data) {
         },
       }
     )
-    if (response.ok) return { success: true };
+    console.log("first call response:`, response.data);")
    
     throw new Error(`Failed to make API call`);
   } catch (error) {
