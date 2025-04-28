@@ -4,10 +4,10 @@ const blandApiUrl = "https://api.bland.ai/v1/calls";
 const apiKey = process.env.BLAND_API_KEY;
 const voiceId = [
   { id: "fc585787-f5a8-4c3d-a16f-759a895c114a", name: "Faye" },
-  { id: "6a63d109-aa30-470c-ab56-a4c1447c4a4c", name: "Alex" },
   { id: "923ef241-cffc-4b6d-a59a-9c3ec3614d53", name: "Brady" },
 ];
 
+const baseUrl = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_BASE_URL : process.env.NEXT_PUBLIC_DEV_URL;
 
 export async function makeCall(data) {
 
@@ -77,10 +77,10 @@ export async function makeCall(data) {
           rescheduledCall: "boolean",
           addtionalInformation: "string",
           bookZoom: "boolean",
-          depositOffer: "boolean",
+          depositOfferAccepted: "boolean",
         },
         webhook:
-          "https://raccoon-credible-elephant.ngrok-free.app/api/call/after",
+          `${baseUrl}/api/call/after`,
       },
       {
         headers: {

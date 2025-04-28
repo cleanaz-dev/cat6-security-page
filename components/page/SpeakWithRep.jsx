@@ -58,10 +58,10 @@ export default function SpeakWithRep({ contact, project, redisId }) {
 
   return (
     <div className="h-screen bg-gradient-to-b from-muted to-background flex flex-col">
-      <header className="text-center py-4 md:py-8">
-        <h1 className="text-3xl lg:text-6xl flex gap-2 items-center justify-center decoration-2 underline decoration-primary">
-          <Shield className="size-8 lg:size-16" />{" "}
-          <span className="tracking-widest">Cat6 Security</span>
+      <header className="text-center py-4 md:py-8 bg-primary">
+        <h1 className="text-3xl lg:text-6xl flex gap-2 items-center justify-center">
+          <Shield className="size-8 lg:size-16 " />
+          <span className="tracking-widest font-semibold">Cat6 Security</span>
         </h1>
       </header>
 
@@ -91,7 +91,7 @@ export default function SpeakWithRep({ contact, project, redisId }) {
             </div>
             <div className="bg-primary p-8 rounded-xl shadow-md">
               <h1 className="text-3xl font-bold  mb-2">
-                Book Your AI Security Consultation
+              Speak with a Representative today!
               </h1>
 
               <div className="space-y-4">
@@ -151,7 +151,7 @@ export default function SpeakWithRep({ contact, project, redisId }) {
       </div>
 
       <div className="text-center mb-4 ">
-        <footer className="text-xs md:text-sm flex justify-center items-center gap-1 text-muted-foreground">
+        <footer className="text-xs md:text-sm flex justify-center items-center gap-1 text-muted-foreground py-4 border-t">
           powered by <span className="text-primary font-bold">LLM GEM</span>
           <Gem className="size-4 md:size-4 text-primary" />
         </footer>

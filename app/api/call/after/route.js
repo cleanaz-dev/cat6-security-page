@@ -1,7 +1,7 @@
 //api/call/after/route.js
 import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
-import { sendFollowUpEmail } from "@/lib/resend";
+import { sendFollowUpEmail, sendDiscountEmail } from "@/lib/resend";
 import { randomUUID } from 'crypto';
 
 /**
@@ -45,8 +45,12 @@ export async function POST(req) {
 
     // Successful call flow
     if (callAnswered) {
-      if (data.analysis?.discountOfferAccepted) {
-        await sendDiscountEmail(existingCall.formData);
+      if (data.analysis?.depositOfferAccepted) {
+        await sendDiscountEmail({
+          ...existingCall.formData, 
+          baseUrl,
+          redisId
+        });
       }
 
       await redis.del(redisKey);
