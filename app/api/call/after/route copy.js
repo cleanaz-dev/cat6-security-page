@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
 import { sendFollowUpEmail, sendDiscountEmail } from "@/lib/resend";
 import { randomUUID } from "crypto";
-import { addOrUpdateContact, logHubSpotCall, logHubSpotEmail } from "@/lib/hubspot";
+import { addOrUpdateContact, logHubSpotCall } from "@/lib/hubspot";
 
 const baseUrl =
   process.env.NODE_ENV === "production"
@@ -24,8 +24,6 @@ export async function POST(req) {
     const redisId = data.metadata?.redisId;
     const callAnswered = data.analysis?.didSomeonePickup;
     const depositOfferAccepted = data.analysis?.depositOfferAccepted;
-    const recordingUrl = data.recording_url;
-    const callSummary = data.summary;
 
     if (!redisId) {
       return NextResponse.json(
@@ -40,42 +38,46 @@ export async function POST(req) {
     const existingCall = JSON.parse((await redis.get(redisKey)) || "{}");
     const attempts = (existingCall.attempts || 0) + 1;
 
-   
-
-
     console.log("existingCall:", existingCall);
 
     // Successful call flow
     if (callAnswered) {
-      const contactData = ({...existingCall.formData.contact, ...existingCall.formData.project})
-      console.log("contactData:", contactData);
 
-      // 2. Create/update contact and get HubSpot ID
-      const contact = await addOrUpdateContact(contactData);
-
-      // 3. Log call with contact association
-      await logHubSpotCall({
-        ...contactData,
-        contactId: contact.id,
-        callDuration: data.analysis?.callDuration,
-        recordingUrl: recordingUrl,
-        depositAccepted: depositOfferAccepted,
-        callSummary: callSummary,
+       // Log the call to HubSpot only if answered
+       await logHubSpotCall({
+        hs_call_title: 'AI Call - Answered',
+        hs_call_body: `AI call successfully completed with ${depositOfferAccepted ? 'accepted' : 'declined'} deposit offer`,
+        hs_timestamp: new Date().toISOString(),
+        hs_call_duration: callDuration?.toString() || '0',
+        hs_call_status: 'COMPLETED',
+        hs_call_direction: 'OUTBOUND',
+        hs_call_outcome: 'CONNECTED',
+        hs_call_recording_url: callRecordingUrl,
+        ...(depositOfferAccepted && { 
+          hs_call_disposition: 'DEPOSIT_OFFER_ACCEPTED' 
+        }),
+        contactId: existingCall.formData?.contact?.id // Pass contact ID if available
       });
-
-      // 4. Handle deposit acceptance
       if (depositOfferAccepted) {
+        const contactData = [...data.formData, depositOfferAccepted];
+        const redisId = randomUUID();
+
+        await addOrUpdateContact({
+          email: formData.contact.email,
+          firstname: formData.contact.name,
+          phone: formData.contact.phone,
+          projectType: formData.project.type,
+          budget: formData.project.budget,
+          cctv_features: formData.project.features,
+        });
+
         await sendDiscountEmail({
           ...contactData,
           baseUrl,
-          redisId
+          redisId,
         });
-        await logHubSpotEmail({
-          contactId: contact.id,
-          subject: "Deposit Offer Accepted",
-          message: `Your deposit offer has been accepted. Please contact us at ${contactData.phone} for more information.`,
-        })
       }
+
 
       await redis.del(redisKey);
       return NextResponse.json({

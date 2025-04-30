@@ -78,6 +78,7 @@ export async function makeCall(data) {
           addtionalInformation: "string",
           bookZoom: "boolean",
           depositOfferAccepted: "boolean",
+          detailedCallSummary: "string",
         },
         webhook:
           `${baseUrl}/api/call/after`,
@@ -89,7 +90,10 @@ export async function makeCall(data) {
         },
       }
     )
-    console.log("first call response:`, response.data);")
+    console.log("first call response:", response.data)
+    if (response.data.status === "success" && response.data.call_id) {
+      return { success: true };
+    }
    
     throw new Error(`Failed to make API call`);
   } catch (error) {
