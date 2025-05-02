@@ -33,6 +33,8 @@ import { useQuote } from "@/lib/context/QuoteProvider"
 
 export default function SingleQuotePage({ quote }) {
   const { logs = [], handleSend, loading } = useQuote()
+  
+  if (!quote) return null
 
   return (
     <div className="container px-2 md:px-0 mx-auto py-4 md:py-8">
@@ -55,13 +57,15 @@ export default function SingleQuotePage({ quote }) {
       <div className="grid grid-cols-1 gap-3 md:gap-6 lg:grid-cols-3">
         {/* Client Info Card */}
         <Card className="order-1">
-          <CardHeader className="p-3 md:p-6">
-            <CardTitle className="flex gap-2 items-center text-sm md:text-base">
+          <CardHeader >
+            <CardTitle >
+              <div className="flex gap-2 items-center">
               <CircleUserRound className="w-4 h-4 md:w-5 md:h-5" />
               Client Information
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 md:p-6 pt-0 space-y-2">
+          <CardContent className="space-y-2">
             <div className="flex gap-2 items-center">
               <User className="w-4 h-4" />
               <p className="font-medium text-sm md:text-base">{quote.client.name}</p>
@@ -83,13 +87,15 @@ export default function SingleQuotePage({ quote }) {
 
         {/* Payment Info Card */}
         <Card className="order-2">
-          <CardHeader className="p-3 md:p-6">
-            <CardTitle className="flex gap-2 items-center text-sm md:text-base">
+        <CardHeader >
+            <CardTitle >
+              <div className="flex gap-2 items-center">
               <Wallet className="w-4 h-4 md:w-5 md:h-5" />
               Payment Details
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 md:p-6 pt-0 space-y-3">
+          <CardContent className="space-y-3">
             <div className="flex justify-between text-sm md:text-base">
               <span>Subtotal</span>
               <span>${quote.total.toFixed(2)}</span>
@@ -103,13 +109,15 @@ export default function SingleQuotePage({ quote }) {
 
         {/* Actions Card - Full width on mobile */}
         <Card className="order-4 lg:order-3">
-          <CardHeader className="p-3 md:p-6 pb-0">
-            <CardTitle className="flex gap-2 items-center text-sm md:text-base">
+        <CardHeader >
+            <CardTitle >
+              <div className="flex gap-2 items-center">
               <Activity className="w-4 h-4 md:w-5 md:h-5" />
               Actions
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 md:p-6">
+          <CardContent>
             <div className="grid grid-cols-2 gap-2 md:gap-3">
               <Button asChild size="sm" className="gap-1 md:gap-2 h-8 md:h-10">
                 <Link href={`/quotes/${quote.id}/edit`}>
@@ -142,13 +150,15 @@ export default function SingleQuotePage({ quote }) {
 
         {/* Items List - Full width */}
         <Card className="order-3 lg:col-span-2 lg:order-4">
-          <CardHeader className="p-3 md:p-6 pb-0">
-            <CardTitle className="flex gap-2 items-center text-sm md:text-base">
+        <CardHeader >
+            <CardTitle >
+              <div className="flex gap-2 items-center">
               <ShoppingBasket className="w-4 h-4 md:w-5 md:h-5" />
               Products ({quote.items.length})
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 md:p-6">
+          <CardContent>
             <Accordion type="single" collapsible>
               {quote.items.map((item) => (
                 <AccordionItem key={item.id} value={item.id} className="border rounded-lg px-3 md:px-4 mb-2">

@@ -75,60 +75,68 @@ export default function CreateQuotePage() {
 
   const categorizedProducts = useProductCategories(stripeProducts);
 
+ 
   return (
-    <div className={`container mx-auto p-6 ${isCartOpen ? "pb-24" : "pb-16"}`}>
+    <div className={`container mx-auto p-4 md:p-6 ${isCartOpen ? "pb-24" : "pb-16"}`}>
       <header className="space-y-2">
-        <p className="flex items-center justify-center text-lg">
-          <Shield className="size-5 mr-1" />
+        <p className="flex items-center justify-center text-base md:text-lg">
+          <Shield className="size-4 md:size-5 mr-1" />
           Cat6 Security
         </p>
-        <h1 className="text-center text-3xl">Create Quote</h1>
+        <h1 className="text-center text-xl md:text-3xl">Create Quote</h1>
       </header>
-      <div className="mt-4 space-y-2">
+
+      {/* Contact Selection */}
+      <div className=" mt-4 space-y-2">
         <Label>Select Contact</Label>
-        <Select
-          value={clientEmail}
-          onValueChange={(value) => setClientEmail(value)}
-        >
-          <SelectTrigger className="w-full p-2 border rounded mb-4">
+        <Select value={clientEmail} onValueChange={setClientEmail}>
+          <SelectTrigger className="w-80 md:max-w-4/5 p-2 text-sm md:text-base">
             <SelectValue placeholder="Select a contact" />
           </SelectTrigger>
-          <SelectContent className="bg-background">
+          <SelectContent className="bg-background  md:max-w-4/5">
             <SelectGroup>
-            
               {hubspotContacts.map((contact) => (
-                <SelectItem key={contact.hs_object_id} value={contact.email}>
-                  {contact.firstname} <span className="text-xs text-secondary">({contact.email})</span> 
-                </SelectItem>
+               <SelectItem
+               key={contact.hs_object_id}
+               value={contact.email}
+               className="text-sm w-80 "
+             >
+               <div className="flex items-center gap-1 overflow-hidden">
+                 <span className="truncate">{contact.firstname}</span>
+                 <span className="text-xs text-muted-foreground truncate">
+                   ({contact.email})
+                 </span>
+               </div>
+             </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Product Selection with Accordion */}
-      <div className="mb-8">
+      {/* Product Selection */}
+      <div className="mb-4 md:mb-8">
         <Accordion type="multiple" className="w-full">
           {categorizedProducts.map(({ category, items, title }) => (
             <AccordionItem key={category} value={category}>
-              <AccordionTrigger className="text-lg font-semibold">
+              <AccordionTrigger className="text-base md:text-lg font-semibold px-2">
                 {title}
               </AccordionTrigger>
               <AccordionContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-2 md:gap-4">
                   {items.map((product) => (
                     <div
                       key={product.id}
-                      className={`p-4 border rounded-lg cursor-pointer ${
+                      className={`p-3 md:p-4 border rounded-lg cursor-pointer ${
                         selectedProducts.some((p) => p.id === product.id)
                           ? "bg-accent border-secondary"
                           : "hover:bg-primary/10"
                       }`}
                       onClick={() => toggleProduct(product)}
                     >
-                      <h3 className="font-medium">{product.name}</h3>
-                      <p className="text-gray-600">
-                        CAD ${product.price.toFixed(2)}
+                      <h3 className="text-sm md:text-base font-medium">{product.name}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">
+                        ${product.price.toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -139,105 +147,108 @@ export default function CreateQuotePage() {
         </Accordion>
       </div>
 
-      {/* Sticky Cart Footer (Always Visible) */}
+      {/* Mobile-Optimized Sticky Cart */}
       {selectedProducts.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
-          {/* Cart Summary */}
-          <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
-            <div>
-              <p className="font-semibold">
+          <div className="flex items-center justify-between p-3 md:p-4 max-w-7xl mx-auto gap-2">
+            <div className="flex-1">
+              <p className="text-xs md:text-sm font-medium">
                 {itemCount} Item{itemCount !== 1 ? "s" : ""}
               </p>
-              <p className="text-secondary">Total: CAD ${total}</p>
+              <p className="text-xs md:text-sm text-muted-foreground">CAD ${total}</p>
             </div>
-            <div className=" text-center text-muted ">
-              <p className="text-xs">powered by LLM GEM</p>
-            </div>
+            <p className="text-[10px] md:text-xs text-muted-foreground text-center">
+              powered by LLM GEM
+            </p>
             <Button
               onClick={() => setIsCartOpen(!isCartOpen)}
-              className="flex items-center cursor-pointer"
+              size="sm"
+              className="text-xs md:text-sm h-8 md:h-10"
             >
-              {isCartOpen ? "Collapse Quote" : "Show Quote"}
+              {isCartOpen ? "Hide" : "Show"}
             </Button>
           </div>
 
-          {/* Cart Details (Togglable) */}
           {isCartOpen && (
-            <div className="bg-muted max-h-[70vh] overflow-y-auto transition-all duration-300 ease-in-out">
-              <div className="p-4 max-w-7xl mx-auto">
-                <h2 className="text-xl font-semibold mb-4">Your Quote</h2>
-                <div className="space-y-3">
+            <div className="bg-muted md:max-h-[50vh] overflow-y-auto">
+              <div className="p-3 md:p-4 max-w-7xl mx-auto">
+                <h2 className="text-lg md:text-xl font-semibold mb-3">Your Quote</h2>
+                <div className="space-y-2">
                   {selectedProducts.map((product) => (
                     <div
                       key={product.id}
-                      className="flex justify-between items-center"
+                      className="flex justify-between items-center text-sm"
                     >
-                      <div>
-                        <p>{product.name}</p>
-                        <div className="flex items-center mt-1">
+                      <div className="flex-1">
+                        <p className="truncate">{product.name}</p>
+                        <div className="flex items-center mt-1 gap-1">
                           <Button
                             variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              updateQuantity(
-                                product.id,
-                                Math.max(1, product.quantity - 1)
-                              )
-                            }
+                            size="xs"
+                            className="h-6 w-6"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateQuantity(product.id, Math.max(1, product.quantity - 1));
+                            }}
                           >
                             -
                           </Button>
-                          <span className="mx-2">{product.quantity}</span>
+                          <span className="mx-1">{product.quantity}</span>
                           <Button
                             variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              updateQuantity(product.id, product.quantity + 1)
-                            }
+                            size="xs"
+                            className="h-6 w-6"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateQuantity(product.id, product.quantity + 1);
+                            }}
                           >
                             +
                           </Button>
                           <Button
                             variant="ghost"
-                            size="icon"
-                            className="ml-2 cursor-pointer hover:bg-rose-700/40"
-                            onClick={() => toggleProduct(product)}
+                            size="xs"
+                            className="h-6 w-6 ml-1 hover:bg-destructive/20"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleProduct(product);
+                            }}
                           >
-                            <Trash2 className="size-4" />
+                            <Trash2 className="size-3 md:size-4" />
                           </Button>
                         </div>
                       </div>
-                      <p>
-                        CAD ${(product.price * product.quantity).toFixed(2)}
+                      <p className="text-xs md:text-sm ml-2">
+                        ${(product.price * product.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
                 </div>
-                {/* Generated Link */}
+
                 {quoteLink && (
-                  <div className="mt-6 p-4 border-primary border-2 rounded-lg">
-                    <p className="font-medium">Quote generated!</p>
+                  <div className="mt-4 p-3 border border-primary rounded-lg">
+                    <p className="text-xs md:text-sm font-medium">Quote Link:</p>
                     <a
                       href={quoteLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 underline break-all"
+                      className="text-xs md:text-sm text-blue-600 underline break-all"
                     >
                       {quoteLink}
                     </a>
                   </div>
                 )}
 
-                {/* Error Handling */}
                 {error && (
-                  <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg">
+                  <div className="mt-3 p-2 bg-destructive/10 text-destructive text-xs md:text-sm rounded-lg">
                     {error}
                   </div>
                 )}
+
                 <Button
                   onClick={generateQuoteLink}
                   disabled={loading}
-                  className="w-full mt-4 cursor-pointer"
+                  className="w-full mt-3 text-xs md:text-sm h-8 md:h-10"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
