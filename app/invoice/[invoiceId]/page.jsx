@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { get } from "@/lib/redis";
+import redis from "@/lib/redis";
 
 export default function InvoicePage({ params }) {
   const { invoiceId } = params;
@@ -15,7 +15,7 @@ export default function InvoicePage({ params }) {
   useEffect(() => {
     const fetchQuote = async () => {
       try {
-        const data = await get(invoiceId);
+        const data = await redis.get(invoiceId);
         if (!data) throw new Error("Quote not found or expired");
         setQuoteData(JSON.parse(data));
       } catch (err) {
