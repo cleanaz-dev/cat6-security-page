@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getOrCreateStripeCustomer, generateStripeQuote } from '@/lib/stripe';
 import { findContactByEmail } from '@/lib/hubspot';
-import redis from '@/lib/redis';
+import { getQuote } from '@/lib/redis';
 import { sendQuoteToClient } from '@/lib/resend';
 
 export async function POST(req) {
@@ -10,10 +10,10 @@ export async function POST(req) {
     const { quoteId } = await req.json();
     
     // 1. Get from Redis
-    const quoteData = await redis.get(`invoice:${quoteId}`);
+    const quote = await getQuote(quoteId);
 
-    if (!quoteData) throw new Error('Quote not found');
-    const quote = JSON.parse(quoteData);
+    if (!quote) throw new Error('Quote not found');
+ 
     // console.log("quote: ", quote);
 
     // 2. Get HubSpot contact
