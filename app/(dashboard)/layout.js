@@ -1,4 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Gem } from "lucide-react";
 import React from "react";
 
 
@@ -7,8 +8,8 @@ export default function DashboardLayout({ children }) {
     <ScrollArea className="h-screen">
       <div className="min-h-screen flex flex-col">
         <main className="flex-1">{children}</main>
-        <footer className="text-xs text-muted text-center py-4">
-          <p>powered by LLM GEM</p>
+        <footer className="flex justify-center items-center gap-2 text-xs text-muted text-center py-4">
+          <p>powered by LLM GEM </p><Gem size={16}/>
         </footer>
       </div>
     </ScrollArea>
