@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request) {
   const { contactEmail } = await request.json();
   console.log("contactEmail:", contactEmail);
-  const dealId = "49840627652"
+  const dealId = "50277305304"
 
   try {
     const quote = await createBasicQuote(contactEmail, dealId);

@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
 import { sendFollowUpEmail, sendDiscountEmail } from "@/lib/resend";
-import { randomUUID } from "crypto";
 import { addOrUpdateContact, logHubSpotCall, logHubSpotEmail } from "@/lib/hubspot";
 
 const baseUrl =
