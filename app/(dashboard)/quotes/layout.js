@@ -12,7 +12,7 @@ export default async function QuoteLayout({ children }) {
   const quotesRaw = await Promise.all(keys.map(key => redis.get(key)));
   const quotes = quotesRaw.map(q => JSON.parse(q));
 
-  // console.log("Quotes:", quotes);
+  console.log("Quotes:", quotes);
 
 
 

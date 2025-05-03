@@ -1,5 +1,6 @@
-// app/[invoiceId]/page.tsx
+// app/quote/[quoteId]/page.tsx
 import SingleQuotePage from '@/components/page/quotes/SingleQuotePage';
+import { getAllActivityForContact } from '@/lib/hubspot';
 import redis from '@/lib/redis';
 import { notFound } from 'next/navigation';
 
@@ -19,7 +20,10 @@ export default async function Page({ params }) {
 
   // 3. Parse the JSON data
   const quote = JSON.parse(invoiceData);
+  const contactEmail = quote.client.email
+  const activities = await getAllActivityForContact(contactEmail);
 
 
-  return <SingleQuotePage quote={quote} />;
+
+  return <SingleQuotePage quote={quote} activities={activities}/>;
 }

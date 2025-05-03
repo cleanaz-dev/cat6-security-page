@@ -123,7 +123,7 @@ export default function CreateQuotePage() {
                 {title}
               </AccordionTrigger>
               <AccordionContent>
-                <div className="grid grid-cols-1 gap-2 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
                   {items.map((product) => (
                     <div
                       key={product.id}
@@ -134,7 +134,7 @@ export default function CreateQuotePage() {
                       }`}
                       onClick={() => toggleProduct(product)}
                     >
-                      <h3 className="text-sm md:text-base font-medium">{product.name}</h3>
+                      <h3 className="text-xs md:text-base font-medium">{product.name}</h3>
                       <p className="text-xs md:text-sm text-muted-foreground">
                         ${product.price.toFixed(2)}
                       </p>
@@ -163,7 +163,7 @@ export default function CreateQuotePage() {
             <Button
               onClick={() => setIsCartOpen(!isCartOpen)}
               size="sm"
-              className="text-xs md:text-sm h-8 md:h-10"
+              className="text-xs md:text-sm"
             >
               {isCartOpen ? "Hide" : "Show"}
             </Button>
@@ -185,7 +185,7 @@ export default function CreateQuotePage() {
                           <Button
                             variant="outline"
                             size="xs"
-                            className="h-6 w-6"
+                            className="h-6 w-6 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               updateQuantity(product.id, Math.max(1, product.quantity - 1));
@@ -197,7 +197,7 @@ export default function CreateQuotePage() {
                           <Button
                             variant="outline"
                             size="xs"
-                            className="h-6 w-6"
+                            className="h-6 w-6 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               updateQuantity(product.id, product.quantity + 1);
@@ -208,7 +208,7 @@ export default function CreateQuotePage() {
                           <Button
                             variant="ghost"
                             size="xs"
-                            className="h-6 w-6 ml-1 hover:bg-destructive/20"
+                            className="h-6 w-6 ml-1 hover:bg-destructive/20 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleProduct(product);

@@ -1,160 +1,235 @@
 "use client";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import { useQuote } from "@/lib/context/QuoteProvider";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useState } from "react";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export default function QuotesPage() {
   const { quotes = [] } = useQuote();
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+
+  const columns = [
+    {
+      accessorKey: "id",
+      header: "Quote #",
+      cell: ({ row }) => {
+        const index = quotes.findIndex((q) => q.id === row.original.id) + 1;
+        return `#${index}`;
+      },
+    },
+    {
+      id: "client_name", // Use a valid column ID
+      accessorFn: (row) => row.client?.name || "No client", // Extract nested property
+      header: "Client",
+      cell: ({ row }) => row.getValue("client_name") || "No client",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge variant={row.original.paymentUrl ? "default" : "secondary"}>
+          {row.original.paymentUrl ? "Active" : "Draft"}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "total",
+      header: "Amount",
+      cell: ({ row }) => `$${(row.original.total || 0).toFixed(2)}`,
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created",
+      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/quotes/${row.original.id}`}>View</Link>
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const table = useReactTable({
+    data: quotes,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+  });
 
   return (
     <div className="container px-2 md:px-0 mx-auto py-4 md:py-8">
-      <header className="flex justify-between items-center mb-4 md:mb-8">
-        <h1 className="text-lg md:text-3xl font-bold">All Quotes</h1>
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-lg md:text-2xl font-bold">All Quotes</h1>
         <Link href="/quotes/create-quote">
-          <Button size="sm" className="text-xs md:text-sm">
-            Create New
-          </Button>
+          <Button size="sm">Create New</Button>
         </Link>
       </header>
 
-      {quotes.length === 0 ? (
-        <div className="text-center py-8 md:py-12">
-          <h3 className="text-base md:text-lg font-medium">
-            No quotes available
-          </h3>
-          <p className="text-muted-foreground text-sm md:text-base mt-1 md:mt-2">
-            Create your first quote to get started
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-3 md:gap-6">
-          {quotes.map((quote, index) => (
-            <Card
-              key={index}
-              className="hover:shadow-lg transition-shadow border border-muted p-2 md:p-4 rounded-lg"
-            >
-              {/* Mobile-first layout */}
-              <CardHeader className="p-2 md:p-6">
-                <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:justify-between md:items-center">
-                  <div>
-                    <CardTitle className="text-sm md:text-lg font-semibold">
-                      Quote #{index + 1}
-                    </CardTitle>
-                    <CardDescription className="text-xs md:text-sm text-muted-foreground">
-                      {quote.client?.name || "No client specified"}
-                    </CardDescription>
-                  </div>
+      <div className="mb-4">
+        <Input
+          placeholder="Filter clients..."
+          value={table.getColumn("client_name")?.getFilterValue() ?? ""}
+          onChange={(event) =>
+            table.getColumn("client_name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+      </div>
 
-                  {/* Mobile: Stacked layout */}
-                  <div className="md:hidden space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="secondary" className="capitalize text-xs">
-                        {quote.paymentUrl ? "Active" : "Draft"}
-                      </Badge>
-                      <span className="text-sm font-medium">
-                        ${quote.total?.toFixed(2) || "0.00"}
-                      </span>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="text-xs"
+      {/* Table for desktop */}
+      <div className="hidden md:block rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const colId = header.column.id;
+                  const isHiddenMobile =
+                    colId === "status" || colId === "createdAt";
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={isHiddenMobile ? "hidden md:table-cell" : ""}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => {
+                    const colId = cell.column.id;
+                    const isHiddenMobile =
+                      colId === "status" || colId === "createdAt";
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={isHiddenMobile ? "hidden md:table-cell" : ""}
                       >
-                        <Link href={`/quotes/${quote.id}`}>View</Link>
-                      </Button>
-                      {quote.paymentUrl && (
-                        <Button size="xs" asChild className="text-xs">
-                          <Link href={quote.paymentUrl} target="_blank">
-                            Pay
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No quotes available
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-                  {/* Desktop: Horizontal layout */}
-                  <div className="hidden md:flex items-center space-x-4">
-                    <Badge variant="secondary" className="capitalize">
-                      {quote.paymentUrl ? "Active" : "Draft"}
-                    </Badge>
-                    <span className="text-lg font-semibold">
-                      ${quote.total?.toFixed(2) || "0.00"}
-                    </span>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/quotes/${quote.id}`}>View</Link>
-                      </Button>
-                      {quote.paymentUrl && (
-                        <Button size="sm" asChild>
-                          <Link href={quote.paymentUrl} target="_blank">
-                            Pay
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
+      {/* Cards for mobile */}
+      <div className="md:hidden space-y-3">
+        {table.getRowModel().rows.length ? (
+          table.getRowModel().rows.map((row) => (
+            <div
+              key={row.id}
+              className="border rounded-md p-3 shadow-sm text-sm"
+            >
+              <div className="flex justify-between items-start mb-1">
+                <span className="text-gray-500">
+                 Quote: #{quotes.findIndex((q) => q.id === row.original.id) + 1}
+                </span>
+                <Badge
+                  variant={row.original.paymentUrl ? "default" : "secondary"}
+                >
+                  {row.original.paymentUrl ? "Active" : "Draft"}
+                </Badge>
+              </div>
+              <div className="font-medium text-base mb-1 truncate">
+                {row.original.client?.name || "No client"}
+              </div>
+              <div className="text-sm mb-1">
+              ${(row.original.total || 0).toFixed(2)}
+              </div>
+              <div className="text-xs text-gray-500 mb-2">
+               Created at: {new Date(row.original.createdAt).toLocaleDateString()}
+              </div>
+              <div className="text-right">
+                <Link href={`/quotes/${row.original.id}`}>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500 py-8">
+            No quotes available
+          </div>
+        )}
+      </div>
 
-              {/* Accordion - same for both mobile and desktop */}
-              <CardContent className="-mt-6 md:mt-0 px-2 md:px-6 pb-4">
-                <Accordion type="single" collapsible>
-                  <AccordionItem value={`quote-${index}`}>
-                    <AccordionTrigger className="text-sm md:text-base">
-                      View Details
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      {quote.items?.length > 0 && (
-                        <div className="mt-2">
-                          <h3 className="font-medium text-sm md:text-base">
-                            Items
-                          </h3>
-                          <ul className="mt-1 space-y-2 md:space-y-1">
-                            {quote.items.map((item, idx) => (
-                              <li
-                                key={idx}
-                                className="flex justify-between text-xs md:text-sm"
-                              >
-                                <span>{item.name}</span>
-                                <span>
-                                  ${item.price} × {item.quantity}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      <div className="mt-2 flex justify-between text-xs md:text-sm">
-                        <span className="text-muted-foreground">Created</span>
-                        <span>
-                          {new Date(quote.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 }

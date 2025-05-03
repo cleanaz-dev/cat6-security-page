@@ -2,11 +2,14 @@
 
 import { createContext, useContext, useMemo, useState } from 'react'
 
+
 const QuoteContext = createContext(null)
 
 export function QuoteProvider({ data, children }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  // ************* FUNCTIONS *************
 
 
   const handleSend = async (quoteId, contactData) => {
@@ -39,13 +42,16 @@ export function QuoteProvider({ data, children }) {
       setLoading(false)
     }
   }
+
+
+  // ************* END OF FUNCTIONS *************
   
   const value = useMemo(() => ({
     handleSend,
     loading,
     error,
     ...data
-  }), [data, loading, error, handleSend])
+  }), [data, loading, error, handleSend ])
   return <QuoteContext.Provider value={value}>{children}</QuoteContext.Provider>
 }
 
