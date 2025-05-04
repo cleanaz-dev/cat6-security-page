@@ -1,25 +1,29 @@
 "use client";
-import { Home, ClipboardList, Contact } from "lucide-react";
-import { UserButton } from "@clerk/nextjs";
+import { Home, ClipboardList, Contact, Receipt, Shield } from "lucide-react";
+import { SignOutButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
 import { useState } from "react";
-import { Shield } from "lucide-react";
+import { LogOut } from "lucide-react";
 
-export default function Menu() {
+export default function Menu({ user }) {
   const [isOpen, setIsOpen] = useState(false);
+  const {user: myUser} = useUser();
+  if (!user) return null;
 
   const navItems = [
     { name: "Home", href: "/home", icon: Home },
     { name: "Quotes", href: "/quotes", icon: ClipboardList },
     { name: "Contacts", href: "/contacts", icon: Contact },
+    { name: "Invoices", href: "/invoices", icon: Receipt },
   ];
 
   return (
@@ -29,7 +33,7 @@ export default function Menu() {
         <Link href="/home" className="text-xl font-bold text-background">
           <div className="flex gap-1 items-center">
             <span>
-              <Shield className="size-6"/>
+              <Shield className="size-6" />
             </span>
             <p className="">Cat6 Security</p>
           </div>
@@ -41,7 +45,7 @@ export default function Menu() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-medium transition-colors"
+              className="text-sm font-medium transition-colors px-2 py-1.5 hover:bg-primary-muted duration-200"
             >
               {item.name}
             </Link>
@@ -74,26 +78,42 @@ export default function Menu() {
 
             <SheetContent side="left" className="w-[300px]">
               <SheetHeader>
-                <SheetTitle className="text-left">Navigation</SheetTitle>
+                <SheetTitle>
+                  <div className="flex gap-1 items-center">
+                    <span>
+                      <Shield className="size-6" />
+                    </span>
+                    <p className="">Cat6 Security</p>
+                  </div>
+                </SheetTitle>
+                <SheetDescription></SheetDescription>
               </SheetHeader>
 
-              <nav className="mt-8 flex flex-col gap-4">
+              <nav className="mt-8 flex flex-col gap-4 px-8 ">
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    className="group"
                   >
-                    <item.icon className="h-4 w-4" />
-                    {item.name}
+                    <span className="flex gap-2 items-center py-4 px-2 group-hover:translate-x-2 transition-all duration-300 ">
+                      <item.icon className="h-4 w-4 text-primary" />
+                      <span className="group-hover:text-secondary transition-all duration-300">
+                        {item.name}
+                      </span>
+                    </span>
                   </Link>
                 ))}
               </nav>
 
-              <div className="mt-auto pt-8">
-                <UserButton />
-              </div>
+              <div className="mt-auto p-8">
+                <div className=" ">
+                <Button asChild>
+                  <SignOutButton /> 
+                  </Button>
+                </div>
+                </div>
             </SheetContent>
           </Sheet>
         </div>

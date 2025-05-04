@@ -8,12 +8,17 @@ export function DashboardProvider({ data, children }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const formatSum = (sum) => {
+    return sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+  
   const value = useMemo(() => ({
     loading,
     error,
+    formatSum,
     // Add your own custom hooks and state here
     ...data,
-  }), [data, loading, error])
+  }), [data, loading, error, formatSum])
 
   return (
     <DashboardContext.Provider value={value}>

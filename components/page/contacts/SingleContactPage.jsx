@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -15,12 +15,38 @@ import { Camera } from "lucide-react";
 import { Calendar } from "lucide-react";
 import { Info } from "lucide-react";
 import { Activity } from "lucide-react";
+import { Clock } from "lucide-react";
+import { Loader2 } from "lucide-react";
+
 
 export default function SingleContactPage({ contactId }) {
-  const { contacts } = useContact();
+  const { contacts, renderActivityLog } = useContact();
+  const [activities, setActivities] = useState([]);
+
 
   // Filter contact by id
   const contact = contacts.find((c) => c.hs_object_id === contactId);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await fetch(`/api/test/hubspot/logs`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ contactEmail: contact.email }),
+        });
+        const data = await response.json();
+        setActivities(data);
+      } catch (error) {
+        console.error("Failed to fetch activities:", error);
+      }
+    };
+  
+    fetchActivities();
+  }, [contact.email]); 
+
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl space-y-4">
@@ -123,20 +149,27 @@ export default function SingleContactPage({ contactId }) {
       </Card>
 
       {/* Activity Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {" "}
-            <span className="flex gap-2 items-center">
-              <Activity className="text-primary" />
-              <h1 className="text-lg md:text-2xl">Activity</h1>
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-500">No recent activity</p>
-        </CardContent>
-      </Card>
+      <Card >
+          <CardHeader>
+            <CardTitle className="flex gap-2 items-center text-sm md:text-base">
+              <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+              Client Activity Log
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+          <div className="space-y-3 min-h-12 max-h-[400px] overflow-y-auto">
+            {activities.length === 0 ? (
+        
+                <span className="text-center h-24" ><Loader2 className="animate-spin"/></span>
+        
+            ) : (
+              activities.map((act) => renderActivityLog(act))
+            )}
+            </div>
+          </CardContent>
+        </Card>
     </div>
   );
 }
+
+

@@ -5,101 +5,137 @@ import { useContact } from "@/lib/context/ContactProvider";
 import Link from "next/link";
 import React, { useState } from "react";
 import AddContactDialog from "./AddContactDialog";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  flexRender,
+} from "@tanstack/react-table";
 
 export default function ContactsPage() {
-  const { contacts } = useContact()
+  const { contacts } = useContact();
   const [searchTerm, setSearchTerm] = useState("");
 
+  const columns = [
+    {
+      id: "contact", // required for filtering/sorting virtual columns
+      header: "Contact",
+      accessorFn: (row) =>
+        `${row.firstname ?? ""} ${row.lastname ?? ""} ${row.email ?? ""}`,
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span>
+            {row.original.firstname} {row.original.lastname}
+          </span>
+          <span className="text-muted-foreground">{row.original.email}</span>
+        </div>
+      ),
+    },
+ 
+      {
+        accessorKey: "phone",
+        header: "Phone",
+        cell: ({ row }) => <span>{row.original.phone}</span>,
+      },
+      {
+        accessorKey: "department",
+        header: "Company",
+        cell: ({ row }) => <span>{row.original.department}</span>,
+      },
+      {
+        accessorKey: "actions",
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+            <Button asChild size="sm">
+              <Link href={`/contacts/${row.original.hs_object_id}`}>View</Link>
+            </Button>
+            <Button variant="secondary" size="sm">
+              Edit
+            </Button>
+          </div>
+        ),
+      },
+  ]
+ 
 
-
-  // Filter contacts based on search term
-  const filteredContacts = contacts.filter(
-    (contact) =>
-      contact.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.phone.toLowerCase().includes(searchTerm.toLowerCase())
-      
-  );
+  const table = useReactTable({
+    data: contacts,
+    columns,
+    state: {
+      globalFilter: searchTerm,
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: setSearchTerm,
+  });
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="container px-2 md:px-0 mx-auto py-4 md:py-8">
       <header className="mb-8">
         <div>
           <h1 className="text-lg md:text-3xl font-bold mb-4">Contacts</h1>
         </div>
         <div className="flex gap-4 w-full">
-          <Input
-            type="text"
-            placeholder="Search contacts..."
-            className="w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+        <Input
+            placeholder="Filter clients..."
+            value={table.getColumn("contact")?.getFilterValue() ?? ""}
+            onChange={(event) =>
+              table.getColumn("contact")?.setFilterValue(event.target.value)
+            }
           />
           <AddContactDialog />
         </div>
       </header>
       <main>
-        {filteredContacts.length > 0 ? (
+        {table.getRowModel().rows?.length > 0 ? (
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-max divide-y divide-gray-200">
+            <table className="w-full min-w-max divide-y">
               <thead className="bg-muted sticky top-0 z-10">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Name
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                  >
-                    Email
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                  >
-                    Phone
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
-                  >
-                    Company
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
-                </tr>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        scope="col"
+                        className={`px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                          header.id === "email" || header.id === "phone"
+                            ? "hidden sm:table-cell"
+                            : header.id === "department"
+                            ? "hidden md:table-cell"
+                            : ""
+                        }`}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
               </thead>
-              <tbody className="bg-foreground divide-y divide-gray-200">
-                {filteredContacts.map((contact,index) => (
-                  <tr key={index}>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {contact.firstname} {contact.lastname}
-                    </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                      {contact.email}
-                    </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                      {contact.phone}
-                    </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                      {contact.department}
-                    </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-500 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                      <Button asChild size="sm">
-                        <Link href={`/contacts/${contact.hs_object_id}`}>
-                        View
-                        </Link>
-                        </Button>
-                      <Button variant="secondary" size="sm">Edit</Button>
-                    </td>
+              <tbody className="divide-y">
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={`px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm ${
+                          cell.column.id === "email" ||
+                          cell.column.id === "phone"
+                            ? "hidden sm:table-cell"
+                            : cell.column.id === "department"
+                            ? "hidden md:table-cell"
+                            : "font-medium"
+                        }`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>

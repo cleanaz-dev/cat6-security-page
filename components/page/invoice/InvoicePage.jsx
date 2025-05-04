@@ -1,5 +1,5 @@
 "use client";
-import { useQuote } from "@/lib/context/QuoteProvider";
+import { useInvoice } from "@/lib/context/InvoiceProvider";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -22,34 +22,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-export default function QuotesPage() {
-  const { quotes = [] } = useQuote();
+export default function InvoicesPage() {
+  const { invoices = [] } = useInvoice();
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
   const columns = [
     {
       accessorKey: "id",
-      header: "Quote #",
+      header: "Invoice #",
       cell: ({ row }) => {
-        const index = quotes.findIndex((q) => q.id === row.original.id) + 1;
+        const index = invoices.findIndex((i) => i.id === row.original.id) + 1;
         return `#${index}`;
       },
     },
     {
-      id: "client_name", // Use a valid column ID
-      accessorFn: (row) => row.client?.name || "No client", // Extract nested property
+      id: "client_name",
+      accessorFn: (row) => row.client?.name || "No client",
       header: "Client",
       cell: ({ row }) => row.getValue("client_name") || "No client",
     },
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => (
-        <Badge variant={row.original.paymentUrl ? "default" : "secondary"}>
-          {row.original.paymentUrl ? "Active" : "Draft"}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const status = row.original.status?.toLowerCase() || 'draft';
+        const variantMap = {
+          paid: 'default',
+          unpaid: 'destructive',
+          draft: 'secondary',
+          overdue: 'destructive',
+          partial: 'outline'
+        };
+        return (
+          <Badge variant={variantMap[status] || 'secondary'}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: "total",
@@ -57,8 +67,15 @@ export default function QuotesPage() {
       cell: ({ row }) => `$${(row.original.total || 0).toFixed(2)}`,
     },
     {
+      accessorKey: "dueDate",
+      header: "Due Date",
+      cell: ({ row }) => row.original.dueDate 
+        ? new Date(row.original.dueDate).toLocaleDateString() 
+        : "-",
+    },
+    {
       accessorKey: "createdAt",
-      header: "Created",
+      header: "Issued",
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
     {
@@ -66,7 +83,7 @@ export default function QuotesPage() {
       cell: ({ row }) => (
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/quotes/${row.original.id}`}>View</Link>
+            <Link href={`/invoices/${row.original.id}`}>View</Link>
           </Button>
         </div>
       ),
@@ -74,7 +91,7 @@ export default function QuotesPage() {
   ];
 
   const table = useReactTable({
-    data: quotes,
+    data: invoices,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -92,7 +109,7 @@ export default function QuotesPage() {
     <div className="container px-2 md:px-0 mx-auto py-4 md:py-8">
       <header className="mb-8">
         <div>
-          <h1 className="text-lg md:text-3xl font-bold mb-4">Quotes</h1>
+          <h1 className="text-lg md:text-3xl font-bold mb-4">Invoices</h1>
         </div>
         <div className="flex gap-4 w-full">
           <Input
@@ -102,22 +119,21 @@ export default function QuotesPage() {
               table.getColumn("client_name")?.setFilterValue(event.target.value)
             }
           />
-          <Link href="/quotes/create-quote">
-            <Button  variant="outline">+ Create New</Button>
+          <Link href="/invoices/create-invoice">
+            <Button variant="outline">+ New Invoice</Button>
           </Link>
         </div>
       </header>
 
       {/* Table for desktop */}
-      <div className="hidden md:block rounded-md border ">
+      <div className="hidden md:block rounded-md border">
         <Table>
-          <TableHeader className="bg-muted" >
+          <TableHeader className="bg-muted">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   const colId = header.column.id;
-                  const isHiddenMobile =
-                    colId === "status" || colId === "createdAt";
+                  const isHiddenMobile = colId === "status" || colId === "dueDate";
                   return (
                     <TableHead
                       key={header.id}
@@ -139,8 +155,7 @@ export default function QuotesPage() {
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => {
                     const colId = cell.column.id;
-                    const isHiddenMobile =
-                      colId === "status" || colId === "createdAt";
+                    const isHiddenMobile = colId === "status" || colId === "dueDate";
                     return (
                       <TableCell
                         key={cell.id}
@@ -161,7 +176,7 @@ export default function QuotesPage() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No quotes available
+                  No invoices available
                 </TableCell>
               </TableRow>
             )}
@@ -179,13 +194,14 @@ export default function QuotesPage() {
             >
               <div className="flex justify-between items-start mb-1">
                 <span className="text-gray-500">
-                  Quote: #
-                  {quotes.findIndex((q) => q.id === row.original.id) + 1}
+                  Invoice: #{invoices.findIndex((i) => i.id === row.original.id) + 1}
                 </span>
-                <Badge
-                  variant={row.original.paymentUrl ? "default" : "secondary"}
-                >
-                  {row.original.paymentUrl ? "Active" : "Draft"}
+                <Badge variant={
+                  row.original.status === 'paid' ? 'default' : 
+                  row.original.status === 'unpaid' ? 'destructive' : 
+                  'secondary'
+                }>
+                  {row.original.status?.charAt(0).toUpperCase() + row.original.status?.slice(1) || 'Draft'}
                 </Badge>
               </div>
               <div className="font-medium text-base mb-1 truncate text-primary">
@@ -194,13 +210,15 @@ export default function QuotesPage() {
               <div className="text-sm mb-1">
                 ${(row.original.total || 0).toFixed(2)}
               </div>
+              <div className="text-xs text-gray-500 mb-1">
+                Due: {row.original.dueDate ? new Date(row.original.dueDate).toLocaleDateString() : "-"}
+              </div>
               <div className="flex justify-between items-center">
-                <div className="text-xs text-gray-500 mb-2">
-                  Created at:{" "}
-                  {new Date(row.original.createdAt).toLocaleDateString()}
+                <div className="text-xs text-gray-500">
+                  Issued: {new Date(row.original.createdAt).toLocaleDateString()}
                 </div>
                 <div className="text-right">
-                  <Link href={`/quotes/${row.original.id}`}>
+                  <Link href={`/invoices/${row.original.id}`}>
                     <Button variant="ghost" size="sm">
                       View
                     </Button>
@@ -211,7 +229,7 @@ export default function QuotesPage() {
           ))
         ) : (
           <div className="text-center text-gray-500 py-8">
-            No quotes available
+            No invoices available
           </div>
         )}
       </div>
