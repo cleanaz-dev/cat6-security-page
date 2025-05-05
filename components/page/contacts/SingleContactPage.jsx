@@ -26,7 +26,7 @@ export default function SingleContactPage({ contactId }) {
     renderActivityLog,
     handleRefresh,
     loading,
-    // updatedAt,
+    updatedAt,
     activities,
   } = useContact();
 
@@ -43,9 +43,9 @@ export default function SingleContactPage({ contactId }) {
     }
   }, [contact?.email]);
 
-  // const formattedUpdatedAt = formatDistanceToNow(new Date(updatedAt), {
-  //   addSuffix: true,
-  // });
+  const formattedUpdatedAt = formatDistanceToNow(new Date(updatedAt), {
+    addSuffix: true,
+  });
 
   if (!contact) {
     return null
@@ -162,12 +162,12 @@ export default function SingleContactPage({ contactId }) {
                 <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary mt-1.5" />
                 <div>
                   <h1 className="text-lg md:text-2xl">Client Activity Log</h1>
-                  {/* {updatedAt && (
+                  {updatedAt && (
                     <p className="text-xs md:text-sm text-muted-foreground font-light">
                       Last updated:{" "}
                      {formattedUpdatedAt}
                     </p>
-                  )} */}
+                  )}
                 </div>
               </div>
               <div>
