@@ -9,6 +9,10 @@ const ContactContext = createContext()
 export default function ContactProvider({ data, children }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [activities, setActivities] = useState([]);
+  const [updatedAt, setUpdatedAt] = useState(null);
+
+
 
   
     const formatDate = (dateString) => {
@@ -16,10 +20,10 @@ export default function ContactProvider({ data, children }) {
     };
   
     const getIcon = (activity) => {
-      if (activity.hs_call_body) return <PhoneCall className="w-4 h-4 text-primary mt-1" />;
-      if (activity.amount) return <DollarSign className="w-4 h-4 text-green-600 mt-1" />;
-      if (activity.hs_email_subject) return <Mail className="w-4 h-4 text-primary mt-1" />;
-      return <ClipboardList className="w-4 h-4 text-muted-foreground mt-1" />;
+      if (activity.hs_call_body) return <PhoneCall className="w-4 h-4 text-primary mt-0.5" />;
+      if (activity.amount) return <DollarSign className="w-4 h-4 text-green-600  mt-0.5" />;
+      if (activity.hs_email_subject) return <Mail className="w-4 h-4 text-primary  mt-0.5" />;
+      return <ClipboardList className="w-4 h-4 text-muted-foreground  mt-0.5" />;
     };
 
 
@@ -27,7 +31,7 @@ export default function ContactProvider({ data, children }) {
       const isCall = 'hs_call_body' in activity;
       const isDeal = 'dealname' in activity;
       const isEmail = 'hs_email_subject' in activity;
-      const isGeneric = !isCall && !isDeal;
+      const isGeneric = !isCall && !isDeal && !isEmail;
     
       const date =
         activity.hs_createdate || activity.createdate || activity.hs_timestamp || '';
@@ -38,12 +42,12 @@ export default function ContactProvider({ data, children }) {
             {getIcon(activity)}
             <div className="flex-1">
               <div className="flex justify-between items-center">
-                <strong className="text-sm">
+                <span className="text-sm decoration-1 decoration-accent">
                   {isCall && activity.hs_call_title}
                   {isDeal && activity.dealname}
                   {isEmail && activity.hs_email_subject}
                   {isGeneric && 'Activity'}
-                </strong>
+                </span>
                 <span className="text-xs text-muted-foreground">
                   {formatDate(date)}
                 </span>
@@ -78,18 +82,41 @@ export default function ContactProvider({ data, children }) {
         </div>
       );
     };
+
+    const handleRefresh = async (contactEmail, refresh = false) => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/test/hubspot/logs`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ contactEmail, refresh }),
+        });
+        const data = await response.json();
+        setActivities(data.activities);
+        setUpdatedAt(data.updatedAt);
+      } catch (error) {
+        console.error("Failed to refresh activities:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
 
-  const value = useMemo(() => ({
-    renderActivityLog,
-    loading,
-    error,
-    setError,
-    setLoading,
-    ...data,
-
-    // other context methods and state here
-  }), [data, loading, error, renderActivityLog])
+    const value = useMemo(() => ({
+      renderActivityLog,
+      handleRefresh,
+      loading,
+      error,
+      setError,
+      setLoading,
+      activities,
+      updatedAt,
+      setActivities,
+      setUpdatedAt,
+      ...data,
+    }), [data, loading, error, activities, updatedAt, setUpdatedAt, handleRefresh]);
 
   return (
     <ContactContext.Provider value={value}>

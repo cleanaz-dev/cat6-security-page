@@ -35,9 +35,12 @@ import {
 } from "@/components/ui/popover";
 import { useQuote } from "@/lib/context/QuoteProvider";
 import { Hash } from "lucide-react";
+import { FileDown } from "lucide-react";
+import { FaRegFilePdf } from "react-icons/fa6";
+import { Archive } from "lucide-react";
 
 export default function SingleQuotePage({ quote }) {
-  const { handleSend, loading } = useQuote();
+  const { handleSend, loading, badgeVariant } = useQuote();
 
 
   if (!quote) return null;
@@ -49,12 +52,13 @@ export default function SingleQuotePage({ quote }) {
     <h1 className="text-xl md:text-3xl font-bold">
       Quote #{quote.id.slice(0, 8)}
     </h1>
+    <div className="flex justify-between">
     <div className="flex flex-col md:flex-row md:items-center gap-2 mt-1 md:mt-2">
       <Badge
-        variant={quote.status === "pending" ? "secondary" : "default"}
+        variant={badgeVariant[quote.status]}
         className="w-fit"
       >
-        {quote.status}
+        <span className="capitalize">{quote.status}</span>
       </Badge>
       <span className="text-xs md:text-sm text-muted-foreground">
         Created: {new Date(quote.createdAt).toLocaleDateString()}
@@ -62,6 +66,19 @@ export default function SingleQuotePage({ quote }) {
       <span className="text-xs md:text-sm text-muted-foreground">
         By: {quote.createBy || "System"}
       </span>
+    </div>
+    <div className="self-end">
+      {/* PDF */}
+      {quote.url ? (
+        
+          <Button asChild size="sm">
+            <Link href={quote.url} target="_blank" rel="noopener noreferrer">
+          <FaRegFilePdf /> Download PDF
+          </Link>
+          </Button>
+  
+      ) : "PDF not available"}
+    </div>
     </div>
   </header>
 
@@ -146,7 +163,15 @@ export default function SingleQuotePage({ quote }) {
               <span className="text-xs md:text-sm">Edit Quote</span>
             </Link>
           </Button>
-          <Button
+          {quote.status === "followUp" ? (
+            <Button 
+              disabled
+            >
+              <Info className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="text-xs md:text-sm">Follow Up</span>
+            </Button>
+          ) : (
+            <Button
             onClick={() => handleSend(quote.id, quote.client)}
             className="gap-1 md:gap-2 cursor-pointer"
             disabled={loading}
@@ -156,12 +181,14 @@ export default function SingleQuotePage({ quote }) {
               {loading ? "Sending..." : "Send to Client"}
             </span>
           </Button>
+          )}
+         
           <Button
-            variant="destructive"
+            variant="secondary"
             className="gap-1 md:gap-2 cursor-pointer"
           >
-            <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="text-xs md:text-sm">Delete</span>
+            <Archive className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="text-xs md:text-sm">Archive</span>
           </Button>
           <Button className="gap-1 md:gap-2 cursor-pointer">
             <StickyNote className="w-3 h-3 md:w-4 md:h-4" />

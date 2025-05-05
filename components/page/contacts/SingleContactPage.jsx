@@ -3,53 +3,56 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronLeft, Phone, Mail, User } from "lucide-react";
+import {
+  ChevronLeft,
+  Phone,
+  Mail,
+  User,
+  Info,
+  Clock,
+  Loader2,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 import Link from "next/link";
 import { useContact } from "@/lib/context/ContactProvider";
 import { Label } from "@/components/ui/label";
-import { ClipboardList } from "lucide-react";
-import { DollarSign } from "lucide-react";
-import { LayoutGrid } from "lucide-react";
-import { Camera } from "lucide-react";
-import { Calendar } from "lucide-react";
-import { Info } from "lucide-react";
-import { Activity } from "lucide-react";
-import { Clock } from "lucide-react";
-import { Loader2 } from "lucide-react";
-
+import { RefreshCcw } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SingleContactPage({ contactId }) {
-  const { contacts, renderActivityLog } = useContact();
-  const [activities, setActivities] = useState([]);
-
+  const {
+    contacts,
+    renderActivityLog,
+    handleRefresh,
+    loading,
+    // updatedAt,
+    activities,
+  } = useContact();
 
   // Filter contact by id
   const contact = contacts.find((c) => c.hs_object_id === contactId);
 
-  useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const response = await fetch(`/api/test/hubspot/logs`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ contactEmail: contact.email }),
-        });
-        const data = await response.json();
-        setActivities(data);
-      } catch (error) {
-        console.error("Failed to fetch activities:", error);
-      }
-    };
-  
-    fetchActivities();
-  }, [contact.email]); 
+  const handleRefreshClick = () => {
+    handleRefresh(contact.email, true); // force refresh
+  };
 
+  useEffect(() => {
+    if (contact?.email) {
+      handleRefresh(contact.email); // defaults to refresh: false (cached)
+    }
+  }, [contact?.email]);
+
+  // const formattedUpdatedAt = formatDistanceToNow(new Date(updatedAt), {
+  //   addSuffix: true,
+  // });
+
+  if (!contact) {
+    return null
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl space-y-4">
+    <div className="container mx-auto px-2 md:px-4 py-8 max-w-4xl space-y-4">
       {/* Back button */}
       <Button asChild variant="ghost" className="mb-6 pl-0 cursor-pointer">
         <Link href="/contacts">
@@ -69,7 +72,9 @@ export default function SingleContactPage({ contactId }) {
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-lg md:text-2xl font-bold ">{contact.firstname}</h1>
+              <h1 className="text-lg md:text-2xl font-bold ">
+                {contact.firstname}
+              </h1>
               <div className="mt-2 space-y-1">
                 <p className="flex gap-2 items-center text-muted-foreground text-sm md:text-base">
                   <Mail className="size-5 text-primary-muted" />
@@ -90,7 +95,7 @@ export default function SingleContactPage({ contactId }) {
         <CardHeader>
           <CardTitle>
             <span className="flex gap-2 items-center">
-              <Info className="text-primary"/>
+              <Info className="text-primary" />
               <h1 className="text-lg md:text-2xl">Project Details</h1>
             </span>
           </CardTitle>
@@ -149,27 +154,54 @@ export default function SingleContactPage({ contactId }) {
       </Card>
 
       {/* Activity Card */}
-      <Card >
-          <CardHeader>
-            <CardTitle className="flex gap-2 items-center text-sm md:text-base">
-              <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-              Client Activity Log
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle className="">
+            <div className="flex justify-between items-center">
+              <div className="flex items-start gap-2">
+                <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary mt-1.5" />
+                <div>
+                  <h1 className="text-lg md:text-2xl">Client Activity Log</h1>
+                  {/* {updatedAt && (
+                    <p className="text-xs md:text-sm text-muted-foreground font-light">
+                      Last updated:{" "}
+                     {formattedUpdatedAt}
+                    </p>
+                  )} */}
+                </div>
+              </div>
+              <div>
+                <button
+                  onClick={handleRefreshClick}
+                  className="text-xs md:text-sm underline text-primary hover:opacity-80 cursor-pointer hover:rotate-180 transition-all duration-500"
+                >
+                  <RefreshCcw />
+                </button>
+              </div>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="space-y-3 min-h-12 max-h-[400px] overflow-y-auto">
-            {activities.length === 0 ? (
-        
-                <span className="text-center h-24" ><Loader2 className="animate-spin"/></span>
-        
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  {/* Title Skeleton (shorter, 60% width) */}
+                  <Skeleton className="h-4 w-[60%] rounded" />
+                  {/* Body Skeleton (full width, taller) */}
+                  <Skeleton className="h-5 w-full rounded" />
+                </div>
+              ))
+            ) : activities.length === 0 ? (
+              <span className="text-center h-24">
+                <Loader2 className="animate-spin" />
+              </span>
             ) : (
               activities.map((act) => renderActivityLog(act))
             )}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-

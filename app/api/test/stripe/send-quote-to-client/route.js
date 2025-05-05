@@ -2,8 +2,9 @@
 import { NextResponse } from 'next/server';
 import { getOrCreateStripeCustomer, generateStripeQuote } from '@/lib/stripe';
 import { findContactByEmail } from '@/lib/hubspot';
-import { getQuote } from '@/lib/redis';
+import { getQuote, setQuoteStatus } from '@/lib/redis';
 import { sendQuoteToClient } from '@/lib/resend';
+import { uploadPdfToCloudinary } from '@/lib/cloudinary';
 
 export async function POST(req) {
   try {
@@ -33,19 +34,31 @@ export async function POST(req) {
       }))
     );
 
-    console.log("stripeQuote",stripeQuote);
     const items = quote.items.length
     const total = quote.total
     
-    const emailResponse = await sendQuoteToClient({pdfBuffer: stripeQuote.finalizedQuote.pdf_buffer, contact, items, total});
-    console.log("emailResponse: ", emailResponse);
-
+    const emailResponse = await sendQuoteToClient({
+      pdfBuffer: stripeQuote.finalizedQuote.pdf_buffer,
+      contact,
+      items,
+      total,
+    });
+    
+    // Store quote status in Redis
+    if (emailResponse.error === null) {
+   
+    
+      // Upload PDF to Cloudinary
+      const { url } = await uploadPdfToCloudinary(stripeQuote.finalizedQuote.pdf_buffer);
+      console.log("PDF uploaded to Cloudinary, URL:", url)
+    
+      console.log("status updated to 'followUp' for quoteId: ", quoteId);
+      await setQuoteStatus(quoteId, 'followUp', url);
+    }
 
     // 5. Get shareable URL
     return NextResponse.json({
       success: true,
-      quoteUrl: stripeQuote.hosted_invoice_url, // Stripe's built-in quote URL
-      expiresAt: stripeQuote.expires_at
     });
 
   } catch (error) {

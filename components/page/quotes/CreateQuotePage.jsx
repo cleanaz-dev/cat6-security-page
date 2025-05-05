@@ -11,7 +11,15 @@ import {
 } from "../../ui/accordion";
 import { useQuote } from "@/lib/context/QuoteProvider";
 import { Label } from "../../ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../ui/select";
+import { Input } from "@/components/ui/input";
 
 export default function CreateQuotePage() {
   const { stripeProducts, hubspotContacts } = useQuote();
@@ -45,7 +53,6 @@ export default function CreateQuotePage() {
   const generateQuoteLink = async () => {
     setLoading(true);
     try {
-
       const contactData = hubspotContacts.find(
         (contact) => contact.email === clientEmail
       );
@@ -74,44 +81,54 @@ export default function CreateQuotePage() {
   const itemCount = selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
 
   const categorizedProducts = useProductCategories(stripeProducts);
+  
 
- 
   return (
-    <div className={`container mx-auto p-4 md:p-6 ${isCartOpen ? "pb-24" : "pb-16"}`}>
+    <div
+      className={`container mx-auto p-4 md:p-6  ${
+        isCartOpen ? "pb-24" : "pb-16"
+      }`}
+    >
       <header className="space-y-2">
-        <p className="flex items-center justify-center text-base md:text-lg">
-          <Shield className="size-4 md:size-5 mr-1" />
-          Cat6 Security
-        </p>
-        <h1 className="text-center text-xl md:text-3xl">Create Quote</h1>
+        <h1 className=" text-xl md:text-2xl">Create Quote</h1>
       </header>
 
       {/* Contact Selection */}
-      <div className=" mt-4 space-y-2">
+      <div className="mt-4 space-y-2 ">
         <Label>Select Contact</Label>
+    <div className="flex ">
         <Select value={clientEmail} onValueChange={setClientEmail}>
-          <SelectTrigger className="w-80 md:max-w-4/5 p-2 text-sm md:text-base">
+          <SelectTrigger className="p-2 text-sm md:text-base  ">
             <SelectValue placeholder="Select a contact" />
           </SelectTrigger>
-          <SelectContent className="bg-background  md:max-w-4/5">
+          <SelectContent className="bg-background ">
             <SelectGroup>
               {hubspotContacts.map((contact) => (
-               <SelectItem
-               key={contact.hs_object_id}
-               value={contact.email}
-               className="text-sm w-80 "
-             >
-               <div className="flex items-center gap-1 overflow-hidden">
-                 <span className="truncate">{contact.firstname}</span>
-                 <span className="text-xs text-muted-foreground truncate">
-                   ({contact.email})
-                 </span>
-               </div>
-             </SelectItem>
+                <SelectItem
+                  key={contact.hs_object_id}
+                  value={contact.email}
+                  className="text-sm "
+                >
+                  <div className="flex items-center gap-1 overflow-hidden">
+                    <span className="truncate">{contact.firstname}</span>
+                  </div>
+                </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
         </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>
+            Email
+          </Label>
+          <Input 
+            value={clientEmail}
+            type="email"
+            disabled={!!clientEmail}
+            readOnly
+          />
+        </div>
       </div>
 
       {/* Product Selection */}
@@ -134,7 +151,9 @@ export default function CreateQuotePage() {
                       }`}
                       onClick={() => toggleProduct(product)}
                     >
-                      <h3 className="text-xs md:text-base font-medium">{product.name}</h3>
+                      <h3 className="text-xs md:text-base font-medium">
+                        {product.name}
+                      </h3>
                       <p className="text-xs md:text-sm text-muted-foreground">
                         ${product.price.toFixed(2)}
                       </p>
@@ -155,7 +174,9 @@ export default function CreateQuotePage() {
               <p className="text-xs md:text-sm font-medium">
                 {itemCount} Item{itemCount !== 1 ? "s" : ""}
               </p>
-              <p className="text-xs md:text-sm text-muted-foreground">CAD ${total}</p>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                CAD ${total}
+              </p>
             </div>
             <p className="text-[10px] md:text-xs text-muted-foreground text-center">
               powered by LLM GEM
@@ -170,9 +191,14 @@ export default function CreateQuotePage() {
           </div>
 
           {isCartOpen && (
-            <div className="bg-muted md:max-h-[50vh] overflow-y-auto">
+            <div className="bg-muted md:max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y"
+       
+            
+            >
               <div className="p-3 md:p-4 max-w-7xl mx-auto">
-                <h2 className="text-lg md:text-xl font-semibold mb-3">Your Quote</h2>
+                <h2 className="text-lg md:text-xl font-semibold mb-3">
+                  Your Quote
+                </h2>
                 <div className="space-y-2">
                   {selectedProducts.map((product) => (
                     <div
@@ -188,7 +214,10 @@ export default function CreateQuotePage() {
                             className="h-6 w-6 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
-                              updateQuantity(product.id, Math.max(1, product.quantity - 1));
+                              updateQuantity(
+                                product.id,
+                                Math.max(1, product.quantity - 1)
+                              );
                             }}
                           >
                             -
@@ -227,7 +256,9 @@ export default function CreateQuotePage() {
 
                 {quoteLink && (
                   <div className="mt-4 p-3 border border-primary rounded-lg">
-                    <p className="text-xs md:text-sm font-medium">Quote Link:</p>
+                    <p className="text-xs md:text-sm font-medium">
+                      Quote Link:
+                    </p>
                     <a
                       href={quoteLink}
                       target="_blank"

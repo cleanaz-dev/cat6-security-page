@@ -50,7 +50,7 @@ export default function AddContactDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer">+ Add Contact</Button>
+        <Button variant="outline" className="cursor-pointer">+ New Contact</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

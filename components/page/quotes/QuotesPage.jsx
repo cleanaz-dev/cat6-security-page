@@ -22,10 +22,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
+
 export default function QuotesPage() {
-  const { quotes = [] } = useQuote();
+  const { quotes = [], badgeVariant } = useQuote();
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
+
+
+  
 
   const columns = [
     {
@@ -46,8 +50,8 @@ export default function QuotesPage() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => (
-        <Badge variant={row.original.paymentUrl ? "default" : "secondary"}>
-          {row.original.paymentUrl ? "Active" : "Draft"}
+        <Badge variant={badgeVariant[row.original.status]}>
+         <span className="capitalize">{row.original.status}</span> 
         </Badge>
       ),
     },
@@ -96,14 +100,14 @@ export default function QuotesPage() {
         </div>
         <div className="flex gap-4 w-full">
           <Input
-            placeholder="Filter clients..."
+            placeholder="Filter quotes..."
             value={table.getColumn("client_name")?.getFilterValue() ?? ""}
             onChange={(event) =>
               table.getColumn("client_name")?.setFilterValue(event.target.value)
             }
           />
           <Link href="/quotes/create-quote">
-            <Button  variant="outline">+ Create New</Button>
+            <Button  variant="outline">+ New Quote</Button>
           </Link>
         </div>
       </header>
@@ -175,20 +179,19 @@ export default function QuotesPage() {
           table.getRowModel().rows.map((row) => (
             <div
               key={row.id}
-              className="border rounded-md p-3 shadow-sm text-sm bg-accent-muted"
+              className="border rounded-md  shadow-sm text-sm "
             >
-              <div className="flex justify-between items-start mb-1">
+              <header className="flex justify-between items-start mb-1 border-b px-2 py-3 bg-accent-muted">
                 <span className="text-gray-500">
                   Quote: #
                   {quotes.findIndex((q) => q.id === row.original.id) + 1}
                 </span>
-                <Badge
-                  variant={row.original.paymentUrl ? "default" : "secondary"}
-                >
-                  {row.original.paymentUrl ? "Active" : "Draft"}
+                <Badge variant={badgeVariant[row.original.status]}>
+                <span className="capitalize">{row.original.status}</span>  
                 </Badge>
-              </div>
-              <div className="font-medium text-base mb-1 truncate text-primary">
+              </header>
+              <main className="px-2 py-3">
+              <div className="font-medium text-base mb-1 truncate text-primary ">
                 {row.original.client?.name || "No client"}
               </div>
               <div className="text-sm mb-1">
@@ -199,14 +202,23 @@ export default function QuotesPage() {
                   Created at:{" "}
                   {new Date(row.original.createdAt).toLocaleDateString()}
                 </div>
-                <div className="text-right">
+                <div className="flex gap-2 text-right">
                   <Link href={`/quotes/${row.original.id}`}>
                     <Button variant="ghost" size="sm">
                       View
                     </Button>
                   </Link>
+                  {row.original.url && (
+                    <Button asChild size="sm">
+                      <Link href={row.original.url}>
+                        PDF
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </div>
+              </main>
+             
             </div>
           ))
         ) : (

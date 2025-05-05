@@ -78,7 +78,7 @@ export default function ContactsPage() {
         </div>
         <div className="flex gap-4 w-full">
         <Input
-            placeholder="Filter clients..."
+            placeholder="Filter contacts..."
             value={table.getColumn("contact")?.getFilterValue() ?? ""}
             onChange={(event) =>
               table.getColumn("contact")?.setFilterValue(event.target.value)

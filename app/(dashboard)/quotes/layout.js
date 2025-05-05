@@ -5,16 +5,18 @@ import { getAllContacts } from "@/lib/hubspot";
 import redis from "@/lib/redis";
 
 export default async function QuoteLayout({ children }) {
-  const stripeProducts = await getStripeProducts();
-  const hubspotContacts = await getAllContacts();
-  
-  const keys = await redis.keys('invoice:*');  
-  const quotesRaw = await Promise.all(keys.map(key => redis.get(key)));
-  const quotes = quotesRaw.map(q => JSON.parse(q));
+  // Fetch all data in parallel
+  const [stripeProducts, hubspotContacts, quotes] = await Promise.all([
+    getStripeProducts(),
+    getAllContacts(),
+    (async () => {
+      const keys = await redis.keys('invoice:*');
+      const quotesRaw = await Promise.all(keys.map(key => redis.get(key)));
+      return quotesRaw.map(q => JSON.parse(q || '{}'));
+    })()
+  ]);
 
-  console.log("Quotes:", quotes);
-
-
+  console.log("quotes:", quotes);
 
   return (
     <QuoteProvider data={{ stripeProducts, hubspotContacts, quotes }}>

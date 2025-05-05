@@ -30,10 +30,9 @@ export function QuoteProvider({ data, children }) {
         })
       })
 
-      if (!response.ok) throw new Error('Failed to send quote')
+      if (!response.success) throw new Error('Failed to send quote')
       
-      const { quoteUrl } = await response.json()
-      window.open(quoteUrl, '_blank') // Open Stripe quote in new tab
+     
 
     } catch (err) {
       setError(err.message)
@@ -45,13 +44,24 @@ export function QuoteProvider({ data, children }) {
 
 
   // ************* END OF FUNCTIONS *************
+
+    const badgeVariant = {
+      pending: "secondary",
+      accepted: "success",
+      rejected: "danger",
+      followUp: "warning",
+      pendingApproval: "info",
+      approved: "primary",
+    };
   
   const value = useMemo(() => ({
     handleSend,
+    badgeVariant,
+
     loading,
     error,
     ...data
-  }), [data, loading, error, handleSend ])
+  }), [data, loading, error, handleSend, badgeVariant])
   return <QuoteContext.Provider value={value}>{children}</QuoteContext.Provider>
 }
 

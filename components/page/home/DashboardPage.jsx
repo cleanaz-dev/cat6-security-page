@@ -17,22 +17,26 @@ import {
   AlertCircle,
   Receipt,
   ReceiptText,
-  DollarSign
+  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/lib/context/DashboardProvider";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { staggerContainer, fadeIn, cardVariants } from "@/lib/motion"
+import { staggerContainer, fadeIn, cardVariants } from "@/lib/motion";
 
 export default function DashboardPage() {
   const { contacts, quotes = [], activity = [], formatSum } = useDashboard();
-  
+
   const quotesSum = quotes.reduce((acc, curr) => acc + curr.total, 0);
-  const pendingQuotes = quotes.filter(quote => quote.status === "pending").length;
-  const sentQuotes = quotes.filter(quote => quote.status === "sent").length;
-  const completedJobs = quotes.filter(quote => quote.status === "completed").length;
-  const failedJobs = quotes.filter(quote => quote.status === "failed").length;
+  const pendingQuotes = quotes.filter(
+    (quote) => quote.status === "pending"
+  ).length;
+  const sentQuotes = quotes.filter((quote) => quote.status === "sent").length;
+  const completedJobs = quotes.filter(
+    (quote) => quote.status === "completed"
+  ).length;
+  const failedJobs = quotes.filter((quote) => quote.status === "failed").length;
 
   return (
     <motion.div
@@ -50,7 +54,7 @@ export default function DashboardPage() {
 
       <main>
         {/* Quick Actions */}
-        <motion.div 
+        <motion.div
           variants={staggerContainer}
           className="grid grid-cols-2 gap-4 pb-4"
         >
@@ -68,7 +72,7 @@ export default function DashboardPage() {
               </Link>
             </Button>
           </motion.div>
-          
+
           <motion.div variants={fadeIn}>
             <Button
               asChild
@@ -86,34 +90,45 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stats Cards */}
-        <motion.div 
+        <motion.div
           variants={staggerContainer}
           className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4"
         >
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card className="group hover:border-primary transition-all duration-500">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">
-                  Total Quotes
+                  <div className="flex items-center justify-between">
+                    <h1 className="flex gap-1">
+                      <span className="hidden md:block">Total</span> Quotes
+                    </h1>
+                    <ReceiptText className="h-4 w-4 text-primary" />
+                  </div>
                 </CardTitle>
-                <ReceiptText className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between text-2xl font-bold">
                   <span>{quotes.length}</span>
-                  <span className="text-muted-foreground">${formatSum(quotesSum)}</span>
+                  <span className="text-muted-foreground text-base md:text-base self-end">
+                    ${formatSum(quotesSum)}
+                  </span>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card className="group hover:border-primary transition-all duration-500">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">
-                  Total Contacts
+                  <div className="flex items-center justify-between">
+                    <h1 className="flex gap-1">
+                      {" "}
+                      <span className="hidden md:block">Total</span> Contacts
+                    </h1>
+                    <Users className="h-4 w-4 text-primary" />
+                  </div>
                 </CardTitle>
-                <Users className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{contacts.length}</div>
@@ -122,12 +137,16 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card className="group hover:border-emerald-400 transition-all duration-500">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">
-                  Total Invoices
+                  <div className="flex flex-row items-center justify-between pb-2">
+                    <h1 className="flex gap-1 group-hover:decoration-amber-500">
+                      <span className="hidden md:block">Total</span> Invoices
+                    </h1>
+                    <Receipt className="h-4 w-4 text-emerald-400 group-hover:rotate-y-360 transition-all duration-500" />
+                  </div>
                 </CardTitle>
-                <Receipt className="h-4 w-4 text-emerald-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">0</div>
@@ -136,12 +155,14 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card className="group hover:border-emerald-400 transition-all duration-500">
+              <CardHeader >
                 <CardTitle className="text-sm font-medium">
-                  Total Revenue
+                  <div className="flex flex-row items-center justify-between pb-2">
+                 <h1 className="flex gap-1"><span className="hidden md:block">Total</span> Revenue</h1> 
+                 <DollarSign className="h-4 w-4 text-emerald-400 group-hover:rotate-y-360 transition-all duration-500" />
+                  </div>
                 </CardTitle>
-                <DollarSign className="h-4 w-4 text-emerald-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-right text-muted-foreground">
@@ -153,12 +174,12 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Status Cards */}
-        <motion.div 
+        <motion.div
           variants={staggerContainer}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
         >
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="group hover:border-yellow-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-yellow-500">
                   Pending Quotes
@@ -172,7 +193,7 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="group hover:border-blue-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-blue-500">
                   Sent Quotes
@@ -186,7 +207,7 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="group hover:border-green-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-green-500">
                   Jobs Completed
@@ -200,12 +221,12 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="group hover:border-rose-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-red-500">
+                <CardTitle className="text-sm font-medium text-rose-500">
                   Jobs Lost
                 </CardTitle>
-                <AlertCircle className="h-4 w-4 text-red-500" />
+                <AlertCircle className="h-4 w-4 text-rose-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{failedJobs}</div>
@@ -234,9 +255,15 @@ export default function DashboardPage() {
                     className="flex items-start gap-4"
                   >
                     <div className="p-2 rounded-full bg-secondary">
-                      {activity.type === "email" && <Mail className="h-4 w-4" />}
-                      {activity.type === "call" && <Phone className="h-4 w-4" />}
-                      {activity.type === "note" && <AlertCircle className="h-4 w-4" />}
+                      {activity.type === "email" && (
+                        <Mail className="h-4 w-4" />
+                      )}
+                      {activity.type === "call" && (
+                        <Phone className="h-4 w-4" />
+                      )}
+                      {activity.type === "note" && (
+                        <AlertCircle className="h-4 w-4" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium">{activity.title}</h3>
@@ -244,8 +271,8 @@ export default function DashboardPage() {
                         {activity.contact} • {activity.date}
                       </p>
                     </div>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       whilehover={{ scale: 1.05 }}
                       whiletap={{ scale: 0.95 }}
@@ -257,7 +284,7 @@ export default function DashboardPage() {
               </motion.div>
             </CardContent>
             <CardFooter className="justify-center">
-              <Button 
+              <Button
                 variant="outline"
                 whilehover={{ scale: 1.05 }}
                 whiletap={{ scale: 0.95 }}
