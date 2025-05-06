@@ -12,25 +12,24 @@ export function QuoteProvider({ data, children }) {
   // ************* FUNCTIONS *************
 
 
-  const handleSend = async (quoteId, contactData) => {
+  const handleSend = async ({quoteId, contact}) => {
     setLoading(true)
     setError(null)
     
     try {
-      const response = await fetch('/api/test/stripe/send-quote-to-client', {
+      const response = await fetch('/api/quotes/send-quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           quoteId,
-          contact: {
-            email: contactData.email,
-            firstname: contactData.firstname,
-            hs_object_id: contactData.hs_object_id
-          }
+          contact,
         })
       })
 
-      if (!response.success) throw new Error('Failed to send quote')
+      const result = await response.json(); // 👈 parse the JSON
+     
+
+      if (!result.success) throw new Error('Failed to send quote')
       
      
 

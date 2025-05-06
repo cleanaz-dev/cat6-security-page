@@ -1,32 +1,35 @@
-// app/api/test/stripe/send-quote-to-client/route.js
 import { NextResponse } from 'next/server';
-import { getOrCreateStripeCustomer, generateStripeQuote } from '@/lib/stripe';
-import { findContactByEmail } from '@/lib/hubspot';
 import { getQuote, setQuoteStatus } from '@/lib/redis';
 import { sendQuoteToClient } from '@/lib/resend';
 
 
 export async function POST(req) {
   try {
-    const { quoteId, contact } = await req.json();
+    const { quoteId } = await req.json();
     console.log("quoteId", quoteId);
-console.log("contact", contact);
-    return
+
+    
 
     const quote = await getQuote(quoteId)
     console.log("quote:", quote)
 
   
-    
+  
     
     const emailResponse = await sendQuoteToClient({
-      pdfBuffer: stripeQuote.finalizedQuote.pdf_buffer,
-      contact,
-      items,
-      total,
+      pdfUrl: quote.url,
+      contact: quote.client,
+      items: quote.items,
+      total: quote.total,
     });
+
+    console.log("email response", emailResponse)
+
+  
     
     await setQuoteStatus(quoteId, "followUp")
+
+    
 
   
     // 5. Get shareable URL

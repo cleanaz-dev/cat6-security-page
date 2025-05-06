@@ -10,13 +10,12 @@ export default async function QuoteLayout({ children }) {
     getStripeProducts(),
     getAllContacts(),
     (async () => {
-      const keys = await redis.keys('invoice:*');
-      const quotesRaw = await Promise.all(keys.map(key => redis.get(key)));
-      return quotesRaw.map(q => JSON.parse(q || '{}'));
+    
+      const keys = await redis.keys('quoteId:*');
+      const quotes = await Promise.all(keys.map(key => redis.json.get(key)))
+      return quotes
     })()
   ]);
-
-  console.log("quotes:", quotes);
 
   return (
     <QuoteProvider data={{ stripeProducts, hubspotContacts, quotes }}>

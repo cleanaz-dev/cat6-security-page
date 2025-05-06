@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "../../ui/select";
 import { Input } from "@/components/ui/input";
+import { useRouter } from 'next/navigation'
 
 export default function CreateQuotePage() {
   const { stripeProducts, hubspotContacts } = useQuote();
@@ -29,6 +30,7 @@ export default function CreateQuotePage() {
   const [quoteLink, setQuoteLink] = useState("");
   const [error, setError] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const router = useRouter() 
 
   // Toggle product selection
   const toggleProduct = (product) => {
@@ -60,13 +62,14 @@ export default function CreateQuotePage() {
       if (!contactData) {
         throw new Error("Selected contact not found");
       }
-      const response = await fetch("/api/test/stripe/create-quote", {
+      const response = await fetch("/api/quotes/generate-quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ products: selectedProducts, contactData }),
       });
-      const { paymentUrl } = await response.json();
-      setQuoteLink(paymentUrl);
+      const { quoteUrl } = await response.json();
+      setQuoteLink(quoteUrl);
+      router.push("/quotes")
     } catch (err) {
       setError(err.message);
     } finally {
