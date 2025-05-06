@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import redis from '@/lib/redis'
 import { randomUUID } from 'crypto';
-import { findContactByEmail } from '@/lib/hubspot';
+import { createNote, findContactByEmail } from '@/lib/hubspot';
 import { generateStripeQuote, getOrCreateStripeCustomer } from '@/lib/stripe';
 import { uploadPdfToCloudinary } from '@/lib/cloudinary';
 
@@ -71,6 +71,12 @@ export async function POST(request) {
       status: 'pending',  // Add explicit status
       createdAt: new Date().toISOString(),
     })  
+
+    await createNote({
+      contactId: contact.id,
+      body: `Quote created total: $${total}<br>Link: <a href="https://yourapp.com/quotes/${quoteId}">View Quote</a>`
+    });
+    
 
 
     return NextResponse.json({

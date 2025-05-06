@@ -71,8 +71,8 @@ export async function POST(req) {
         });
         await logHubSpotEmail({
           contactId: contact.id,
-          subject: "Deposit Offer Accepted",
-          message: `Your deposit offer has been accepted. Please contact us at ${contactData.phone} for more information.`,
+          subject: "Deposit Offer Sent",
+          message: `Deposit offer sent follow up needed to confirm onsite visit and quote details.`,
         })
       }
 
