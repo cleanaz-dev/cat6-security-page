@@ -32,6 +32,7 @@ import { useQuote } from "@/lib/context/QuoteProvider";
 
 import { FaRegFilePdf } from "react-icons/fa6";
 import { Archive } from "lucide-react";
+import { Hash } from "lucide-react";
 
 export default function SingleQuotePage({ quote }) {
   const { handleSend, loading, badgeVariant } = useQuote();
