@@ -28,6 +28,7 @@ export async function POST(req) {
       ...(raw.deals || []),
       ...(raw.emails || []),
       ...(raw.tasks || []),
+      ...(raw.notes || [])
     ].sort((a, b) => {
       const dateA = new Date(a.hs_createdate || a.createdate || a.hs_timestamp);
       const dateB = new Date(b.hs_createdate || b.createdate || b.hs_timestamp);

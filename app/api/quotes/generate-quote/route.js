@@ -74,7 +74,7 @@ export async function POST(request) {
 
     await createNote({
       contactId: contact.id,
-      body: `Quote created total: $${total}<br>Link: <a href="https://yourapp.com/quotes/${quoteId}">View Quote</a>`
+      body: `Quote created total: $${total}. View the quote at: View Quote (ID:${quoteId})`
     });
     
 

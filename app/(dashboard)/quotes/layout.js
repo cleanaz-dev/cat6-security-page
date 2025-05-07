@@ -17,6 +17,8 @@ export default async function QuoteLayout({ children }) {
     })()
   ]);
 
+  // console.log("qutoes;", quotes)
+
   return (
     <QuoteProvider data={{ stripeProducts, hubspotContacts, quotes }}>
       <div>{children}</div>

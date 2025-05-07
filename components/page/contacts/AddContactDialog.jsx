@@ -1,112 +1,108 @@
-import React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+import { useForm } from 'react-hook-form';
+import { Button } from "@/components/ui/button";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-
-// Form schema validation
-const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
-  }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 digits.",
-  }),
-})
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { AddNewContactSchema } from "@/lib/schemas";
+import { useContact } from '@/lib/context/ContactProvider';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function AddContactDialog() {
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-    },
-  })
+  const { handleAddNewContact, loading } = useContact();
 
-  function onSubmit(values) {
-    console.log(values) // Handle form submission
-  }
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(AddNewContactSchema),
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      phone: "",
+      email:"",
+    }
+  });
+
+  const onSubmit = async (data) => {
+    console.log("Data", data)
+    const { error, message } = await handleAddNewContact(data);
+    
+    if (error) {
+      toast.error(message);
+    } else {
+      toast.success(message);
+      reset();
+    }
+  };
 
   return (
-    <Dialog>
+    <Dialog  onOpenChange={() => reset()}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer">+ New Contact</Button>
+        <Button variant="outline">+ New Contact</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Contact</DialogTitle>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className='space-y-2'>
+            <Label>First Name</Label>
+            <Input
+              {...register("firstname")}
+              placeholder='John'
             />
-            
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            {errors.firstname && (
+              <p className="text-red-500 text-sm">{errors.firstname.message}</p>
+            )}
+          </div>
+
+          <div className='space-y-2'>
+            <Label>Last Name</Label>
+            <Input
+              {...register("lastname")}
+              placeholder="Doe"
             />
-            
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+1 (555) 123-4567" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            {errors.lastname && (
+              <p className="text-red-500 text-sm">{errors.lastname.message}</p>
+            )}
+          </div>
+
+          <div className='space-y-2'>
+            <Label>Phone</Label>
+            <Input
+              {...register("phone")}
+              placeholder="555-123-4567"
             />
-            
-            <Button type="submit" className="w-full">
-              Save Contact
-            </Button>
-          </form>
-        </Form>
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone.message}</p>
+            )}
+          </div>
+          <div className='space-y-2'>
+              <Label>Email</Label>
+              <Input 
+                {...register("email")}
+                placeholder="@"
+              />
+               {errors.phone && (
+              <p className="text-rose-500 text-sm">{errors.phone.message}</p>
+            )}
+          </div>
+
+          <Button type="submit" disabled={loading}>
+            {loading ? "Adding..." : "Add Contact"}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

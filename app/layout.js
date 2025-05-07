@@ -2,6 +2,8 @@ import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "sonner";
+
 
 const inter = Inter({ subsets: ["latin"] });
 const orbitron = Orbitron({
@@ -24,7 +26,10 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={orbitron.className}>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            {children}
+            <Toaster richColors="true" theme="system"/>
+            </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -1,6 +1,13 @@
 "use client";
-import { Home, ClipboardList, Contact, Receipt, Shield } from "lucide-react";
-import { SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import {
+  Home,
+  ClipboardList,
+  Contact,
+  Receipt,
+  Shield,
+  Handshake,
+} from "lucide-react";
+import { SignOutButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,17 +20,19 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { LogOut } from "lucide-react";
+import { ThemeChanger } from "@/lib/hooks/useTheme";
 
 export default function Menu({ user }) {
   const [isOpen, setIsOpen] = useState(false);
-  const {user: myUser} = useUser();
+
   if (!user) return null;
 
   const navItems = [
-    { name: "Home", href: "/home", icon: Home },
+
     { name: "Quotes", href: "/quotes", icon: ClipboardList },
     { name: "Contacts", href: "/contacts", icon: Contact },
     { name: "Invoices", href: "/invoices", icon: Receipt },
+    { name: "Team", href: "/team", icon: Handshake },
   ];
 
   return (
@@ -41,6 +50,10 @@ export default function Menu({ user }) {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 text-background">
+          <div className="bg-background p-0.5 rounded-full opacity-50">
+          <ThemeChanger />
+          </div>
+         
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -86,10 +99,15 @@ export default function Menu({ user }) {
                     <p className="">Cat6 Security</p>
                   </div>
                 </SheetTitle>
-                <SheetDescription></SheetDescription>
+                <SheetDescription>
+               
+                </SheetDescription>
               </SheetHeader>
-
+             
               <nav className="mt-8 flex flex-col gap-4 px-8 ">
+              <div>
+              <ThemeChanger />
+              </div>
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
@@ -105,15 +123,17 @@ export default function Menu({ user }) {
                     </span>
                   </Link>
                 ))}
+    
               </nav>
 
               <div className="mt-auto p-8">
+             
                 <div className=" ">
-                <Button asChild>
-                  <SignOutButton /> 
+                  <Button asChild>
+                    <SignOutButton />
                   </Button>
                 </div>
-                </div>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
