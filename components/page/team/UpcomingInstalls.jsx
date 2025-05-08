@@ -79,6 +79,7 @@ export default function UpcomingInstalls({ jobs, members }) {
     getCoreRowModel: getCoreRowModel(),
   });
 
+
   return (
     <Card className="bg-background border-none shadow-none">
       <CardHeader className="pb-2">
