@@ -79,9 +79,20 @@ export default function ContactProvider({ data, children }) {
       if (activity.hs_call_body) return <PhoneCall className="w-4 h-4 text-primary mt-0.5" />;
       if (activity.amount) return <DollarSign className="w-4 h-4 text-green-600  mt-0.5" />;
       if (activity.hs_email_subject) return <Mail className="w-4 h-4 text-primary  mt-0.5" />;
-      if (activity.hs_note_body) return <Info className="w-4 h-4 text-warning mt-0.5" />
+      if (activity.hs_note_body) return <Info className="w-4 h-4 text-secondary mt-0.5" />
       return <ClipboardList className="w-4 h-4 text-muted-foreground  mt-0.5" />;
     };
+    // Function to determine the type of note based on its content
+function getNoteType(noteBody) {
+  if (noteBody.startsWith("Quote created")) {
+    return "New Quote";
+  }
+  if (noteBody.startsWith("Job") || noteBody.startsWith("Install")) {
+    return "New Job";
+  }
+  return "Note"; // Default case
+}
+
 
 
     const renderActivityLog = (activity) => {
@@ -106,7 +117,7 @@ export default function ContactProvider({ data, children }) {
                   {isDeal && activity.dealname}
                   {isEmail && activity.hs_email_subject}
                   {isGeneric && 'Activity'}
-                  {isNote && "Note"}
+                  {isNote && getNoteType(activity.hs_note_body)} {/* Custom label */}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {formatDate(date)}
