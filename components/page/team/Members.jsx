@@ -4,14 +4,10 @@ import { Button } from '@/components/ui/button';
 export default function Members({ members }) {
   return (
     <div className=" py-6 md:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className='flex justify-between'>
+      <div className=" px-4 sm:px-6 lg:px-8">
+        <header className=''>
         <h1 className="text-2xl font-bold  mb-12">Team</h1>
-        <Button asChild>
-          <Link href="/team/schedule">
-            View Schedule
-          </Link>
-        </Button>
+        
         </header>
   
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

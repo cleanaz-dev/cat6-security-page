@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertCircle, Clock, MessageSquare, User, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { Tags } from 'lucide-react';
+import NewTicketDialog from './NewTicketDialog';
 
 export default function OpenTickets({ openTickets }) {
   // Group tickets by priority for the overview cards
@@ -25,11 +26,7 @@ export default function OpenTickets({ openTickets }) {
             Open Tickets
           </h1>
         </div>
-        <Button asChild size="sm" className="w-full sm:w-auto">
-          <Link href="/tickets/new">
-            Create New Ticket
-          </Link>
-        </Button>
+       <NewTicketDialog />
       </div>
 
       {/* Priority Overview Cards */}

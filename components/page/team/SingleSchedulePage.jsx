@@ -56,7 +56,10 @@ export default function SingleSchedulePage({ install }) {
         headers: {
           "Content-Type": "application/json", // ✅ Fix: proper header key and value
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          techId: user.id,
+          installId: install.id
+        }),
       });
   
       if (!response.ok) {

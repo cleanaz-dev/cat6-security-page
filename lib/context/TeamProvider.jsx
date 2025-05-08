@@ -51,12 +51,32 @@ export default function TeamProvider({ data, children }) {
     ).filter(name => name);
   };
 
+  const handleNewTicket = async (data) => {
+    try {
+      const response = await fetch("/api/team/tickets",{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
   const value = useMemo(() => ({
     jobTypes,
     handleAddInstallation,
     getTechNames,
+    handleNewTicket,
     ...data
-  }), [data, jobTypes, handleAddInstallation, getTechNames])
+  }), [data, jobTypes, handleAddInstallation, getTechNames, handleNewTicket])
 return <TeamContext.Provider value={value}>
   {children}
 </TeamContext.Provider>

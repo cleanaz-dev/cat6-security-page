@@ -16,12 +16,11 @@ const columnHelper = createColumnHelper();
 
 export default function UpcomingInstalls({ jobs, members }) {
   const { getTechNames } = useTeam();
- 
 
   const columns = [
     columnHelper.accessor("title", {
       header: "Job Title",
-      cell: info => (
+      cell: (info) => (
         <div className="flex flex-col">
           <span className="font-medium text-primary">{info.getValue()}</span>
           <div className="flex items-center text-sm text-muted-foreground mt-1">
@@ -33,7 +32,7 @@ export default function UpcomingInstalls({ jobs, members }) {
     }),
     columnHelper.accessor("jobType", {
       header: "Type",
-      cell: info => (
+      cell: (info) => (
         <Badge variant="outline" className="capitalize">
           {info.getValue().toLowerCase()}
         </Badge>
@@ -41,12 +40,12 @@ export default function UpcomingInstalls({ jobs, members }) {
     }),
     columnHelper.accessor("technician", {
       header: "Technicians",
-      cell: info => (
+      cell: (info) => (
         <div className="flex flex-wrap gap-1">
           {getTechNames(info.getValue(), members).map((name, index) => (
-            <Badge 
-              key={index} 
-              variant="secondary" 
+            <Badge
+              key={index}
+              variant="secondary"
               className="text-xs flex items-center gap-1"
             >
               <User className="h-3 w-3" />
@@ -58,7 +57,7 @@ export default function UpcomingInstalls({ jobs, members }) {
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: info => (
+      cell: (info) => (
         <Badge variant="secondary" className="capitalize">
           {info.getValue().toLowerCase()}
         </Badge>
@@ -66,11 +65,9 @@ export default function UpcomingInstalls({ jobs, members }) {
     }),
     columnHelper.display({
       id: "actions",
-      cell: info => (
+      cell: (info) => (
         <Button asChild size="sm" className="w-full sm:w-auto">
-          <Link href={`/team/schedule/${info.row.original.id}`}>
-            View
-          </Link>
+          <Link href={`/team/schedule/${info.row.original.id}`}>View</Link>
         </Button>
       ),
     }),
@@ -86,13 +83,24 @@ export default function UpcomingInstalls({ jobs, members }) {
     <Card className="bg-background border-none shadow-none">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold flex flex-col sm:flex-row sm:items-center gap-2">
-          <div className="flex items-center gap-2">
-            <Wrench className="h-5 w-5 text-primary" />
-            <span className="text-xl sm:text-2xl">Upcoming Jobs</span>
+        <div className="flex flex-col md:flex-row justify-between items-center w-full">
+            <div className="flex items-center gap-2">
+              {" "}
+              <Wrench className="h-5 w-5 text-primary" />
+              <span className="text-xl sm:text-2xl">Upcoming Jobs</span>{" "}
+              <Badge
+                variant="outline"
+                className=""
+              >
+                {jobs.length} scheduled
+              </Badge>
+            </div>
+            <div className="mt-2 md:mt-0 ">
+              <Button asChild className="w-full md:w-auto">
+                <Link href="/team/schedule">View Schedule</Link>
+              </Button>
+            </div>
           </div>
-          <Badge variant="outline" className="sm:ml-auto bg-accent/20 mt-2 sm:mt-0">
-            {jobs.length} scheduled
-          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -100,9 +108,9 @@ export default function UpcomingInstalls({ jobs, members }) {
         <div className="hidden md:block">
           <table className="w-full">
             <thead>
-              {table.getHeaderGroups().map(headerGroup => (
+              {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="text-left border-b">
-                  {headerGroup.headers.map(header => (
+                  {headerGroup.headers.map((header) => (
                     <th key={header.id} className="pb-3 px-2">
                       {flexRender(
                         header.column.columnDef.header,
@@ -114,12 +122,12 @@ export default function UpcomingInstalls({ jobs, members }) {
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map(row => (
-                <tr 
-                  key={row.id} 
+              {table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
                   className="border-b hover:bg-accent/20 transition-colors"
                 >
-                  {row.getVisibleCells().map(cell => (
+                  {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="py-3 px-2">
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -163,18 +171,24 @@ export default function UpcomingInstalls({ jobs, members }) {
 
                 {job.technician.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Techs:</span>
+                    <span className="text-sm text-muted-foreground">
+                      Techs:
+                    </span>
                     <div className="flex flex-wrap gap-1">
-                      {getTechNames(job.technician, members).map((name, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="secondary" 
-                          className="text-xs flex items-center gap-1"
-                        >
-                          <User className="h-3 w-3" />
-                          <span className="truncate max-w-[80px]">{name}</span>
-                        </Badge>
-                      ))}
+                      {getTechNames(job.technician, members).map(
+                        (name, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs flex items-center gap-1"
+                          >
+                            <User className="h-3 w-3" />
+                            <span className="truncate max-w-[80px]">
+                              {name}
+                            </span>
+                          </Badge>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -182,9 +196,7 @@ export default function UpcomingInstalls({ jobs, members }) {
 
               <div className="mt-3">
                 <Button asChild size="sm" className="w-full">
-                  <Link href={`/team/schedule/${job.id}`}>
-                    View Details
-                  </Link>
+                  <Link href={`/team/schedule/${job.id}`}>View Details</Link>
                 </Button>
               </div>
             </div>

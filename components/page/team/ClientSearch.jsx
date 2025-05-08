@@ -17,8 +17,8 @@ export function ClientSearch({ clients, onSelect }) {
   });
 
   return (
-    <div className="relative space-y-2">
-      <Label>Client</Label>
+    <div className="relative ">
+    
       <div className='flex gap-1'>
       <Input
         type="text"
