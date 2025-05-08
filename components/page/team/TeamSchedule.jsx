@@ -90,7 +90,7 @@ export default function TeamSchedule() {
           </Button>
 
           <div className="text-sm text-muted-foreground">
-          <Button variant="ghost">Installs: {installs.length}</Button>
+          <Button variant="ghost">Pending Jobs: {installs.length}</Button>
           </div>
         </div>
       </div>

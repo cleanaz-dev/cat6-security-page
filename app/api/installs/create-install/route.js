@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
 import { randomUUID } from "crypto";
+import { createNote } from "@/lib/hubspot";
 
 export async function POST(req) {
   try {
@@ -30,6 +31,11 @@ export async function POST(req) {
       end: data.end,
       createdAt: new Date().toISOString(),
     });
+
+    await createNote({
+      contactId: contact.hs_object_id,
+      body: `Job ${data.jobType} booked. ${data.title}`
+    })
 
     return NextResponse.json({ success: true });
   } catch (error) {

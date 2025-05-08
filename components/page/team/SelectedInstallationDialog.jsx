@@ -134,7 +134,9 @@ export function SelectedInstallationDialog({
 
             <div className="pt-4 border-t">
               <Button className="w-full bg-primary text-primary-foreground hover:bg-secondary hover:text-foreground transition-all duration-300 cursor-pointer">
+                <Link href={`/team/schedule/${id}`}>
                 View Full Details
+                </Link>
               </Button>
             </div>
           </div>

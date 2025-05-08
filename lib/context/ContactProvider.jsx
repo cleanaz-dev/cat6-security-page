@@ -28,50 +28,53 @@ export default function ContactProvider({ data, children }) {
     function formatNote(noteBody) {
       if (!noteBody) return noteBody;
     
-      // 1. Extract UUID and capture the entire () wrapper
-      const idRegex = /\((ID:)?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\)/i;
-      const [fullMatch, idPrefix, quoteId] = noteBody.match(idRegex) || [];
+      // Check if the note starts with "Quote created total:"
+      if (noteBody.startsWith("Quote")) {
+        // Extract UUID and capture the entire () wrapper
+        const idRegex = /\((ID:)?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\)/i;
+        const [fullMatch, idPrefix, quoteId] = noteBody.match(idRegex) || [];
     
-      // 2. Find "View Quote" position
-      const linkText = "View Quote";
-      const linkIndex = noteBody.indexOf(linkText);
+        // 2. Find "View Quote" position
+        const linkText = "View Quote";
+        const linkIndex = noteBody.indexOf(linkText);
     
-      if (linkIndex !== -1) {
-        return (
-          <>
-            {/* Text before link (remove parentheses and ID) */}
-            {fullMatch 
-              ? noteBody.substring(0, linkIndex).replace(fullMatch, '').trim()
-              : noteBody.substring(0, linkIndex)
-            }
-            
-            {/* Interactive Link */}
-            {quoteId ? (
-              <Link 
-                href={`/quotes/${quoteId}`}
-                className="text-blue-600 hover:underline ml-1 font-medium"
-              >
-                {linkText}
-              </Link>
-            ) : (
-              <span className="text-gray-400 ml-1">
-                {linkText}
-              </span>
-            )}
+        if (linkIndex !== -1) {
+          return (
+            <>
+              {/* Text before link (remove parentheses and ID) */}
+              {fullMatch 
+                ? noteBody.substring(0, linkIndex).replace(fullMatch, '').trim()
+                : noteBody.substring(0, linkIndex)
+              }
+              
+              {/* Interactive Link */}
+              {quoteId ? (
+                <Link 
+                  href={`/quotes/${quoteId}`}
+                  className="text-blue-600 hover:underline ml-1 font-medium"
+                >
+                  {linkText}
+                </Link>
+              ) : (
+                <span className="text-gray-400 ml-1">
+                  {linkText}
+                </span>
+              )}
     
-            {/* Text after link (remove parentheses and ID) */}
-            {fullMatch
-              ? noteBody.substring(linkIndex + linkText.length).replace(fullMatch, '').trim()
-              : noteBody.substring(linkIndex + linkText.length)
-            }
-          </>
-        );
+              {/* Text after link (remove parentheses and ID) */}
+              {fullMatch
+                ? noteBody.substring(linkIndex + linkText.length).replace(fullMatch, '').trim()
+                : noteBody.substring(linkIndex + linkText.length)
+              }
+            </>
+          );
+        }
       }
     
-      // Fallback: Remove ID wrapper if no link found
-      return fullMatch ? noteBody.replace(fullMatch, '').trim() : noteBody;
+      // Fallback: If no specific format is matched, just return the original body
+      return noteBody;
     }
-
+    
     const getIcon = (activity) => {
       if (activity.hs_call_body) return <PhoneCall className="w-4 h-4 text-primary mt-0.5" />;
       if (activity.amount) return <DollarSign className="w-4 h-4 text-green-600  mt-0.5" />;
