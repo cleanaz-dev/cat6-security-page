@@ -1,3 +1,5 @@
+//api/installs/[id]/check-in/route.js
+
 import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
 
@@ -5,6 +7,7 @@ export async function POST(req, { params }) {
   try {
     const { id: installId } = params;
     const { techId } = await req.json();
+    return NextResponse.json({ success: true })
 
     if (!techId) {
       return NextResponse.json({ error: "Missing techId" }, { status: 400 });

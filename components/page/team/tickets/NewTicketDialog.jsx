@@ -82,7 +82,7 @@ export default function NewTicketDialog() {
           <DialogTitle>Create New Support Ticket</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+       
             <div className="space-y-2">
               <Label>Client</Label>
               <Controller
@@ -132,8 +132,7 @@ export default function NewTicketDialog() {
                 </p>
               )}
             </div>
-          </div>
-
+ 
           <div className="space-y-2">
             <Label htmlFor="subject">Subject</Label>
             <Controller

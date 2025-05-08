@@ -15,13 +15,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { isToday, parseISO } from "date-fns";
 
 export default function SingleSchedulePage({ install }) {
   const { getTechNames, members } = useTeam();
   const [isOnSite, setIsOnSite] = useState();
   const [loading, setLoading] = useState(false)
   const { user } = useUser()
-
+  console.log("install", install)
 
   // Format date and time
   const formattedDate = new Date(install.start).toLocaleDateString("en-US", {
@@ -36,6 +37,9 @@ export default function SingleSchedulePage({ install }) {
     minute: "2-digit",
     hour12: true,
   });
+
+    // Check if install date is today
+    const isInstallToday = isToday(parseISO(install.start));
 
   // Unified info item component for consistent styling
   const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
@@ -94,7 +98,7 @@ export default function SingleSchedulePage({ install }) {
                 // TODO: Call check-in API here
               }
             }}
-            disabled={isOnSite}
+            disabled={isOnSite || !isInstallToday || loading}
             className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-accent transition-colors text-primary-foreground"
           >
             Check In
@@ -108,7 +112,7 @@ export default function SingleSchedulePage({ install }) {
                   // TODO: Call check-out API here
                 }
               }}
-              disabled={!isOnSite}
+              disabled={!isOnSite || loading}
               className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-accent transition-colors bg-secondary text-secondary-foreground"
             >
               Check Out

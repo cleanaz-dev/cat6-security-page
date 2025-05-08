@@ -98,6 +98,7 @@ export function NewInstallationDialog({
             {/* Client Section */}
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label>Client</Label>
                 <Controller
                   name="client"
                   control={control}
