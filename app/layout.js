@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
         <body className={orbitron.className}>
           <ThemeProvider>
             {children}
-            <Toaster richColors="true" theme="system"/>
+            <Toaster richColors="true" theme="system" position="top-center"/>
             </ThemeProvider>
         </body>
       </html>

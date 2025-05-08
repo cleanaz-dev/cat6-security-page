@@ -138,7 +138,7 @@ export default function SpeakWithRep({ contact, project, redisId }) {
                   type="button"
                   className="w-full bg-accent hover:bg-blue-700 text-white py-3 px-6 rounded-md font-medium transition-colors cursor-pointer"
                   onClick={handleMakeCall}
-                  disabled={status.loading || status.success}
+                  disabled={status.loading || status.success || !selectedTime}
                 >
                   {status.loading ? "Calling..." : 
                   status.success? "Call Booked!" : 

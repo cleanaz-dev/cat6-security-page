@@ -26,18 +26,15 @@ import { motion } from "framer-motion";
 import { staggerContainer, fadeIn, cardVariants } from "@/lib/motion";
 
 export default function DashboardPage() {
-  const { contacts, quotes = [], activity = [], formatSum } = useDashboard();
+  const { contacts, quotes = [], activity = [], formatSum, installs = [] } = useDashboard();
 
   const quotesSum = quotes.reduce((acc, curr) => acc + curr.total, 0);
   const pendingQuotes = quotes.filter(
     (quote) => quote.status === "pending"
   ).length;
   const sentQuotes = quotes.filter((quote) => quote.status === "sent").length;
-  const completedJobs = quotes.filter(
-    (quote) => quote.status === "completed"
-  ).length;
-  const failedJobs = quotes.filter((quote) => quote.status === "failed").length;
-
+  const pendingInstalls = installs.filter((install) => install.status !== "completed").length
+  const completedInstalls = installs.filter((install) => install.status === "completed").length
   return (
     <motion.div
       initial="hidden"
@@ -207,29 +204,31 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="group hover:border-green-500 transition-all duration-500">
+            <Card className="group hover:border-yellow-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-green-500">
-                  Jobs Completed
+                <CardTitle className="text-sm font-medium text-yellow-500">
+                  Installs Pending
                 </CardTitle>
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <AlertCircle className="h-4 w-4 text-yellow-500" />
+           
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{completedJobs}</div>
+                <div className="text-2xl font-bold">{pendingInstalls}</div>
               </CardContent>
             </Card>
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="group hover:border-rose-500 transition-all duration-500">
+            <Card className="group hover:border-green-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-rose-500">
-                  Jobs Lost
+                <CardTitle className="text-sm font-medium text-green-500">
+                  Installs Completed
                 </CardTitle>
-                <AlertCircle className="h-4 w-4 text-rose-500" />
+          
+                <CheckCircle className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{failedJobs}</div>
+                <div className="text-2xl font-bold">{completedInstalls}</div>
               </CardContent>
             </Card>
           </motion.div>
