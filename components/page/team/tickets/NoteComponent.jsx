@@ -5,6 +5,7 @@ import { useTeam } from "@/lib/context/TeamProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Edit2 } from "lucide-react";
 
 export default function NoteComponent({ notes = [] }) {
   const { members } = useTeam();
@@ -12,23 +13,24 @@ export default function NoteComponent({ notes = [] }) {
   if (!notes.length) {
     return (
       <div className="flex items-center justify-center p-6">
-        <p className="text-muted-foreground text-sm">No notes yet. Add your first note.</p>
+        <p className="text-muted-foreground text-sm">
+          No notes yet. Add your first note.
+        </p>
       </div>
     );
   }
 
   function getTech(id) {
-    const tech = members?.find(member => member.id === id);
+    const tech = members?.find((member) => member.id === id);
     return tech || { fullName: "Unknown", imageUrl: "" };
   }
 
   return (
     <div className="mt-4">
-      
-        <header className="text-lg flex items-center gap-2 mb-6">
-          <MessageCircle className="h-5 w-5 text-primary" />
-          <span className="font-bold">Activity Notes</span>
-        </header>
+      <header className="text-lg flex items-center gap-2 mb-6">
+        <MessageCircle className="h-5 w-5 text-primary" />
+        <span className="font-bold">Activity Notes</span>
+      </header>
 
       <main className="space-y-4">
         {notes.map((note) => (
@@ -45,23 +47,26 @@ export default function NoteComponent({ notes = [] }) {
                   {getTech(note.authorId).fullName}
                 </p>
                 <span className="text-muted-foreground text-xs">
-                  {new Date(note.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                  {new Date(note.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </span>
               </div>
               <p className="text-sm mt-1 pl-2 border-l-2 border-primary/20">
                 {note.text}
               </p>
-              <div className="  text-right ">
-                <Button size="icon" variant="destructive">
-                <Trash className="size-4" />
+              <div className="flex justify-end gap-2">
+                <Button size="icon" >
+                  <Edit2 className="size-4" />
                 </Button>
-                </div>
+                 <Button size="icon" variant="destructive">
+                  <Trash className="size-4" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}
