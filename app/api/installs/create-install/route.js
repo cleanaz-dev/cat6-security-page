@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
 import { randomUUID } from "crypto";
 import { createNote } from "@/lib/hubspot";
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST(req) {
   try {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     const data = await req.json();
 
     if (!data) {

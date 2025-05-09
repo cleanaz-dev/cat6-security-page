@@ -75,7 +75,7 @@ export default function NewTicketDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">Create New Ticket</Button>
+        <Button className="gap-2 w-full md:w-auto">Create New Ticket</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>

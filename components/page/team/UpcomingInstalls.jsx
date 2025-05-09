@@ -82,7 +82,7 @@ export default function UpcomingInstalls({ jobs, members }) {
 
   return (
     <Card className="bg-background border-none shadow-none">
-      <CardHeader className="pb-2">
+      <CardHeader className="">
         <CardTitle className="text-lg font-semibold flex flex-col sm:flex-row sm:items-center gap-2">
         <div className="flex flex-col md:flex-row justify-between items-center w-full">
             <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function UpcomingInstalls({ jobs, members }) {
                 {jobs.length} scheduled
               </Badge>
             </div>
-            <div className="mt-2 md:mt-0 ">
+            <div className="mt-4 md:mt-0 ">
               <Button asChild className="w-full md:w-auto">
                 <Link href="/team/schedule">View Schedule</Link>
               </Button>

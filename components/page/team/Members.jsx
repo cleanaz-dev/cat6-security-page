@@ -1,12 +1,13 @@
 import React from 'react'
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Users } from 'lucide-react';
 export default function Members({ members }) {
   return (
     <div className=" py-6 md:py-12">
       <div className=" px-4 sm:px-6 lg:px-8">
-        <header className=''>
-        <h1 className="text-2xl font-bold  mb-12">Team</h1>
+        <header className='flex justify-center md:justify-normal'>
+        <h1 className="text-2xl font-bold  mb-12 flex items-center gap-2 "><Users className='text-primary'/>Team</h1>
         
         </header>
   

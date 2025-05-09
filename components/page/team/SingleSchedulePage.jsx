@@ -15,14 +15,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
-import { isToday, parseISO } from "date-fns";
+import { isToday, parseISO, formatDistanceToNow, isTomorrow } from "date-fns";
+import { Clock } from "lucide-react";
 
 export default function SingleSchedulePage({ install }) {
   const { getTechNames, members } = useTeam();
   const [isOnSite, setIsOnSite] = useState();
-  const [loading, setLoading] = useState(false)
-  const { user } = useUser()
-  console.log("install", install)
+  const [loading, setLoading] = useState(false);
+  const { user } = useUser();
+  console.log("install", install);
 
   // Format date and time
   const formattedDate = new Date(install.start).toLocaleDateString("en-US", {
@@ -38,8 +39,8 @@ export default function SingleSchedulePage({ install }) {
     hour12: true,
   });
 
-    // Check if install date is today
-    const isInstallToday = isToday(parseISO(install.start));
+  // Check if install date is today
+  const isInstallToday = isToday(parseISO(install.start));
 
   // Unified info item component for consistent styling
   const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
@@ -52,6 +53,13 @@ export default function SingleSchedulePage({ install }) {
     </div>
   );
 
+  const getTimeUntil = (dateString) => {
+    const date = parseISO(dateString);
+    if (isToday(date)) return "Today";
+    if (isTomorrow(date)) return "Tomorrow";
+    return formatDistanceToNow(date, { addSuffix: true });
+  };
+
   const handleCheckIn = async (data) => {
     setLoading(true);
     try {
@@ -62,10 +70,10 @@ export default function SingleSchedulePage({ install }) {
         },
         body: JSON.stringify({
           techId: user.id,
-          installId: install.id
+          installId: install.id,
         }),
       });
-  
+
       if (!response.ok) {
         toast.error("Error checking in user");
       } else {
@@ -78,7 +86,7 @@ export default function SingleSchedulePage({ install }) {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="flex items-center justify-between mb-6">
@@ -89,21 +97,26 @@ export default function SingleSchedulePage({ install }) {
           {install.status}
         </Badge>
       </div>
-      <div className="flex justify-between">
+      <div className="flex flex-col md:flex-row md:justify-between">
         <div className="flex gap-3 justify-start mb-6">
-          <Button
-            onClick={() => {
-              if (!isOnSite) {
-                setIsOnSite(true);
-                // TODO: Call check-in API here
-              }
-            }}
-            disabled={isOnSite || !isInstallToday || loading}
-            className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-accent transition-colors text-primary-foreground"
-          >
-            Check In
-          </Button>
-
+          <div className="flex items-center">
+            <Button
+              onClick={() => {
+                if (!isOnSite) {
+                  setIsOnSite(true);
+                  // TODO: Call check-in API here
+                }
+              }}
+              disabled={isOnSite || !isInstallToday || loading}
+              className="text-sm font-medium hover:bg-accent transition-colors text-primary-foreground"
+            >
+              Check In
+            </Button>
+            <div className="ml-2 flex items-center gap-2 text-primary-muted">
+              <Clock className="size-4"/><p>{getTimeUntil(install.start)}</p>
+            </div>
+            
+          </div>
           {isOnSite && (
             <Button
               onClick={() => {
@@ -113,20 +126,20 @@ export default function SingleSchedulePage({ install }) {
                 }
               }}
               disabled={!isOnSite || loading}
-              className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-accent transition-colors bg-secondary text-secondary-foreground"
+              className="text-sm font-medium hover:bg-accent transition-colors bg-secondary text-secondary-foreground"
             >
               Check Out
             </Button>
           )}
         </div>
         {/* Action Buttons - Moved to the top */}
-        <div className="flex gap-3  mb-6">
-          <button className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-accent transition-colors">
+        <div className="flex gap-3  mb-6 justify-between">
+          <Button variant="outline" className=" text-sm font-medium ">
             Edit Job
-          </button>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+          </Button>
+          <Button className="bg-primary  text-sm font-medium transition-colors">
             Mark as Complete
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -190,7 +203,7 @@ export default function SingleSchedulePage({ install }) {
               </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4">
+          <CardContent >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InfoItem icon={User} label="Name" value={install.name} />
               <InfoItem icon={Phone} label="Phone" value={install.phone} />

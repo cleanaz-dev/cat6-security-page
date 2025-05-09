@@ -15,22 +15,24 @@ export default function OpenTickets({ openTickets }) {
     medium: openTickets.filter(t => t.priority === 'medium').length,
     low: openTickets.filter(t => t.priority === 'low').length
   };
-
+console.log("opentickets", openTickets)
   return (
     <div className="px-4 sm:px-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+         <div className="flex flex-col md:flex-row justify-between items-center w-full">
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
             <Tags className="text-primary w-5 h-5 sm:w-6 sm:h-6" />
             Open Tickets
           </h1>
         </div>
+        <div className='flex mx-auto '>
        <NewTicketDialog />
+       </div>
       </div>
 
       {/* Priority Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <PriorityCard 
           priority="high" 
           count={priorityCounts.high} 
@@ -60,9 +62,9 @@ export default function OpenTickets({ openTickets }) {
                 <TableRow>
                   <TableHead className="text-xs sm:text-sm">Ticket ID</TableHead>
                   <TableHead className="text-xs sm:text-sm">Subject</TableHead>
-                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Requester</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Client</TableHead>
                   <TableHead className="text-xs sm:text-sm">Priority</TableHead>
-                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">Last Updated</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">Created At</TableHead>
                   <TableHead className="text-xs sm:text-sm">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -78,24 +80,24 @@ export default function OpenTickets({ openTickets }) {
                             {ticket.comments}
                           </span>
                         )}
-                        {ticket.subject}
+                       <span className='capitalize'>{ticket.subject}</span> 
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
                         <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                        {ticket.requester}
+                        {ticket.client}
                       </div>
                     </TableCell>
                     <TableCell>
                       <PriorityBadge priority={ticket.priority} />
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-xs sm:text-sm">
-                      {new Date(ticket.updatedAt).toLocaleDateString()}
+                      {new Date(ticket.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link aantal href={`/tickets/${ticket.id}`} className="flex items-center gap-1 text-xs sm:text-sm">
+                        <Link href={`/team/tickets/${ticket.id}`} className="flex items-center gap-1 text-xs sm:text-sm">
                           View <ArrowUpRight className="h-3 w-3" />
                         </Link>
                       </Button>
@@ -127,9 +129,9 @@ function PriorityCard({ priority, count, icon }) {
   };
 
   const priorityLabels = {
-    high: 'High Priority',
-    medium: 'Medium Priority',
-    low: 'Low Priority'
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low'
   };
 
   return (
@@ -142,7 +144,7 @@ function PriorityCard({ priority, count, icon }) {
       </CardHeader>
       <CardContent>
         <div className="text-xl sm:text-2xl font-bold">{count}</div>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-xs text-muted-foreground mt-1 hidden md:block">
           {count === 1 ? 'ticket' : 'tickets'} requiring attention
         </p>
       </CardContent>

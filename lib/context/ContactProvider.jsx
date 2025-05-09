@@ -14,16 +14,9 @@ export default function ContactProvider({ data, children }) {
   const [activities, setActivities] = useState([]);
   const [updatedAt, setUpdatedAt] = useState(null);
 
-
-
-  
     const formatDate = (dateString) => {
       return format(new Date(dateString), 'MMM d, yyyy');
     };
-  
-
-
-
 
     function formatNote(noteBody) {
       if (!noteBody) return noteBody;
@@ -90,9 +83,8 @@ function getNoteType(noteBody) {
   if (noteBody.startsWith("Job") || noteBody.startsWith("Install")) {
     return "New Job";
   }
-  return "Note"; // Default case
+  return "Ticket"; // Default case
 }
-
 
 
     const renderActivityLog = (activity) => {

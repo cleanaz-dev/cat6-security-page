@@ -1,16 +1,17 @@
 import { getAllClerkUsers } from '@/lib/clerk';
 import TeamProvider from '@/lib/context/TeamProvider'
 import { getAllContacts } from '@/lib/hubspot';
-import redis, { getAllInstalls, getAllQuotes } from '@/lib/redis';
+import redis, { getAllInstalls, getAllQuotes, getOpenTickets } from '@/lib/redis';
 
 
 export default async function TeamLayout({ children }) {
          // Fetch data in parallel to reduce loading time
-    const [contacts, team, quotes, installs] = await Promise.all([
+    const [contacts, team, quotes, installs, openTickets] = await Promise.all([
       getAllContacts(),
       getAllClerkUsers(),
       getAllQuotes(),
-      getAllInstalls()
+      getAllInstalls(),
+      getOpenTickets()
     ]);
 
     const members = team.map(user => ({
@@ -25,7 +26,7 @@ export default async function TeamLayout({ children }) {
    
   return (
     <div>
-      <TeamProvider data={{ contacts, members, quotes, installs }}>
+      <TeamProvider data={{ contacts, members, quotes, installs, openTickets }}>
         {children}
       </TeamProvider>
     </div>

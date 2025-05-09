@@ -5,7 +5,7 @@ import redis from "@/lib/redis";
 
 export async function POST(req, { params }) {
   try {
-    const { id: installId } = params;
+    const { id: installId } = await params;
     const { techId } = await req.json();
     return NextResponse.json({ success: true })
 

@@ -8,8 +8,8 @@ import UpcomingInstalls from "./UpcomingInstalls";
 import OpenTickets from "./tickets/OpenTickets";
 
 export default function TeamPage() {
-  const { installs, getTechNames, members } = useTeam();
-  const openTickets = [];
+  const { installs, getTechNames, members, openTickets } = useTeam();
+
 
   return (
     <>
