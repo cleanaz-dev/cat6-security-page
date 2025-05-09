@@ -17,6 +17,7 @@ import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { isToday, parseISO, formatDistanceToNow, isTomorrow } from "date-fns";
 import { Clock } from "lucide-react";
+import CompleteJobDialog from "./schedule/CompleteJobDialog";
 
 export default function SingleSchedulePage({ install }) {
   const { getTechNames, members } = useTeam();
@@ -24,6 +25,8 @@ export default function SingleSchedulePage({ install }) {
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
   console.log("install", install);
+
+  const isComplete = install.status === "complete"
 
   // Format date and time
   const formattedDate = new Date(install.start).toLocaleDateString("en-US", {
@@ -134,12 +137,10 @@ export default function SingleSchedulePage({ install }) {
         </div>
         {/* Action Buttons - Moved to the top */}
         <div className="flex gap-3  mb-6 justify-between">
-          <Button variant="outline" className=" text-sm font-medium ">
+          <Button variant="outline" className=" text-sm font-medium " disabled={isComplete}>
             Edit Job
           </Button>
-          <Button className="bg-primary  text-sm font-medium transition-colors">
-            Mark as Complete
-          </Button>
+          <CompleteJobDialog installId={install.id} isComplete={isComplete}/>
         </div>
       </div>
 

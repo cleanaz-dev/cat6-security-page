@@ -14,6 +14,8 @@ import {
   StickyNote,
   Pencil,
   Info,
+  Hash,
+  Archive,
 } from "lucide-react";
 import {
   Table,
@@ -29,13 +31,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useQuote } from "@/lib/context/QuoteProvider";
-
 import { FaRegFilePdf } from "react-icons/fa6";
-import { Archive } from "lucide-react";
-import { Hash } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function SingleQuotePage({ quote }) {
   const { handleSend, loading, badgeVariant } = useQuote();
+
+  const { refresh } = useRouter();
 
   if (!quote) return null;
 
@@ -165,16 +169,34 @@ export default function SingleQuotePage({ quote }) {
                 </Button>
               ) : (
                 <Button
-                  onClick={() =>
-                    handleSend({ quoteId: quote.id, contact: quote.client })
-                  }
-                  className="gap-1 md:gap-2 cursor-pointer"
+                  onClick={async () => {
+                    try {
+                      await handleSend({
+                        quoteId: quote.id,
+                        contact: quote.client,
+                      });
+                      refresh();
+                      toast.success(" Sent quote to client")
+                    } catch (error) {
+                      toast.error("Failed to send quote");
+                    }
+                  }}
+                  className="gap-1 md:gap-2"
                   disabled={loading}
+                  aria-disabled={loading}
+                  aria-busy={loading}
                 >
-                  <Mail className="w-3 h-3 md:w-4 md:h-4" />
-                  <span className="text-xs md:text-sm">
-                    {loading ? "Sending..." : "Send to Client"}
-                  </span>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
+                      <span className="text-xs md:text-sm">Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-3 h-3 md:w-4 md:h-4" />
+                      <span className="text-xs md:text-sm">Send to Client</span>
+                    </>
+                  )}
                 </Button>
               )}
 

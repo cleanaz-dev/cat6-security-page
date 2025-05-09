@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getQuote, setQuoteStatus } from '@/lib/redis';
 import { sendQuoteToClient } from '@/lib/resend';
+import { logHubSpotEmail } from '@/lib/hubspot';
 
 
 export async function POST(req) {
@@ -11,6 +12,7 @@ export async function POST(req) {
     
 
     const quote = await getQuote(quoteId)
+    const contactId = quote.client.hs_object_id
     console.log("quote:", quote)
 
   
@@ -28,6 +30,12 @@ export async function POST(req) {
   
     
     await setQuoteStatus(quoteId, "followUp")
+
+    await logHubSpotEmail({
+      contactId: contactId,
+      message: "Contact was sent quote, will need a follow up",
+      subject: "Quote sent"
+    })
 
     
 

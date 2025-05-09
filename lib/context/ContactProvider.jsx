@@ -77,11 +77,11 @@ export default function ContactProvider({ data, children }) {
     };
     // Function to determine the type of note based on its content
 function getNoteType(noteBody) {
-  if (noteBody.startsWith("Quote created")) {
-    return "New Quote";
+  if (noteBody.startsWith("Quote")) {
+    return "Quote";
   }
   if (noteBody.startsWith("Job") || noteBody.startsWith("Install")) {
-    return "New Job";
+    return "Job";
   }
   return "Ticket"; // Default case
 }

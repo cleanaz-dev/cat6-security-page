@@ -6,6 +6,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 export function TechnicianSelect({ value = [], onChange, members }) {
   const toggle = (id) => {
@@ -19,7 +20,7 @@ export function TechnicianSelect({ value = [], onChange, members }) {
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-between font-normal text-sm text-muted-foreground "
+          className="w-full justify-between font-normal text-sm text-muted-foreground truncate "
         >
           {value.length > 0
             ? members
@@ -46,12 +47,12 @@ export function TechnicianSelect({ value = [], onChange, members }) {
                 onCheckedChange={() => toggle(member.id)}
                 id={member.id}
               />
-              <label
+              <Label
                 htmlFor={member.id}
                 className="text-sm text-foreground flex-1 cursor-pointer"
               >
                 {member.fullName}
-              </label>
+              </Label>
             </div>
           ))}
         </div>

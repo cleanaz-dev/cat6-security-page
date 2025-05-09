@@ -24,9 +24,10 @@ import { useDashboard } from "@/lib/context/DashboardProvider";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeIn, cardVariants } from "@/lib/motion";
+import { Tags } from "lucide-react";
 
 export default function DashboardPage() {
-  const { contacts, quotes = [], activity = [], formatSum, installs = [] } = useDashboard();
+  const { contacts, quotes = [], activity = [], formatSum, installs = [], tickets } = useDashboard();
 
   const quotesSum = quotes.reduce((acc, curr) => acc + curr.total, 0);
   const pendingQuotes = quotes.filter(
@@ -113,7 +114,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </motion.div>
-
+          {/* Contacts */}
           <motion.div variants={cardVariants}>
             <Card className="group hover:border-primary transition-all duration-500">
               <CardHeader>
@@ -150,6 +151,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </motion.div>
+          {/* Total Revenue */}
 
           <motion.div variants={cardVariants}>
             <Card className="group hover:border-emerald-400 transition-all duration-500">
@@ -193,12 +195,12 @@ export default function DashboardPage() {
             <Card className="group hover:border-blue-500 transition-all duration-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-blue-500">
-                  Sent Quotes
+                  Open Tickets
                 </CardTitle>
-                <Mail className="h-4 w-4 text-blue-500" />
+                <Tags className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{sentQuotes}</div>
+                <div className="text-2xl font-bold">{tickets.length}</div>
               </CardContent>
             </Card>
           </motion.div>

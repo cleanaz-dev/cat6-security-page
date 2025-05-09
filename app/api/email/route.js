@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import Bottleneck from 'bottleneck';
 import { randomUUID } from "crypto";
 import redis from "@/lib/redis";
+import { logHubSpotEmail } from "@/lib/hubspot";
 
 // Rate limiter configuration
 const limiter = new Bottleneck({
@@ -82,6 +83,8 @@ export async function POST(req) {
         baseUrl
       })
     );
+
+    await logHubSpotEmail()
 
     // Log success
     console.log('Email sent:', {
