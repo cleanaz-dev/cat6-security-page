@@ -11,7 +11,7 @@ export default async function TeamLayout({ children }) {
       getAllClerkUsers(),
       getAllQuotes(),
       getAllInstalls(),
-      getOpenTickets()
+      getOpenTickets(),
     ]);
 
     const members = team.map(user => ({

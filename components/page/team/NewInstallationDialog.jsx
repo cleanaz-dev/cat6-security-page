@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { InstallSchema } from "@/lib/schemas";
 import { format, addHours } from "date-fns";
 import { useTeam } from "@/lib/context/TeamProvider";
@@ -34,8 +34,15 @@ export function NewInstallationDialog({
   setShowAddForm,
   selectedDate,
 }) {
-  const { contacts, members, quotes, jobTypes, handleAddInstallation } =
-    useTeam();
+  const {
+    contacts,
+    members,
+    quotes,
+    jobTypes,
+    handleAddInstallation,
+    openTickets,
+    invoices = [],
+  } = useTeam();
   const [loading, setLoading] = useState(false);
   const { refresh } = useRouter();
 
@@ -85,6 +92,30 @@ export function NewInstallationDialog({
       refresh();
     }
   };
+  const jobType = useWatch({
+    control,
+    name: "jobType", // make sure this matches your field name
+  });
+
+  const jobTypeFieldMap = {
+    "New Install": {
+      name: "invoice",
+      label: "Invoice",
+      options: invoices,
+    },
+    "Site Inspection": {
+      name: "quote",
+      label: "Quote",
+      options: quotes,
+    },
+    Repair: {
+      name: "ticket",
+      label: "Ticket",
+      options: openTickets,
+    },
+  };
+
+  const selectedField = jobTypeFieldMap[jobType];
 
   return (
     <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
@@ -190,6 +221,36 @@ export function NewInstallationDialog({
                   </p>
                 )}
               </div>
+
+              {selectedField && (
+                <div className="space-y-2">
+                  <Label>{selectedField.label}</Label>
+                  <Controller
+                    name={selectedField.name}
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={`Select ${selectedField.label}`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background">
+                          {selectedField.options.map((option) => (
+                            <SelectItem key={option.id} value={option.id}>
+                              <p>{option.id.slice(0, 6)}</p>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label>Technician</Label>
                 <Controller
