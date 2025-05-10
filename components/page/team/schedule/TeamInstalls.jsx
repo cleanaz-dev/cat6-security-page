@@ -5,6 +5,7 @@ import {
   useReactTable,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,79 +17,89 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function TeamInstalls({ installs }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
-  
-const columns = [
-  {
-    accessorKey: "name",
-    header: "Client",
-    cell: ({ row }) => (
-      <div className="flex flex-col gap-1">
-        <div className="font-medium">{row.original.name}</div>
-        <Badge
-          variant={
-            row.original.status === "complete" ? "success" : 
-            row.original.status === "scheduled" ? "default" : "warning"
-          }
-          className="w-fit capitalize"
-        >
-          {row.original.status}
-        </Badge>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "jobDetails",
-    header: "Job Details",
-    cell: ({ row }) => (
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="capitalize">
-            {row.original.jobType}
+  const [statusFilter, setStatusFilter] = React.useState("all");
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const filteredData = React.useMemo(() => {
+    if (statusFilter === "all") return installs;
+    return installs.filter((install) => install.status === statusFilter);
+  }, [installs, statusFilter]);
+
+  const columns = [
+    {
+      accessorKey: "name",
+      header: "Client",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1">
+          <div className="font-medium">{row.original.name}</div>
+          <Badge
+            variant={
+              row.original.status === "complete"
+                ? "success"
+                : row.original.status === "scheduled"
+                ? "default"
+                : "warning"
+            }
+            className="w-fit capitalize"
+          >
+            {row.original.status}
           </Badge>
-          <div className="text-sm text-muted-foreground">
-            {new Date(row.original.start).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "jobDetails",
+      header: "Job Details",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="capitalize">
+              {row.original.jobType}
+            </Badge>
+            <div className="text-sm text-muted-foreground">
+              {new Date(row.original.start).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {row.original.technician.map((tech, i) => (
+              <Badge key={i} variant="secondary" className="text-xs">
+                Tech {i + 1}
+              </Badge>
+            ))}
           </div>
         </div>
-        <div className="flex flex-wrap gap-1">
-          {row.original.technician.map((tech, i) => (
-            <Badge key={i} variant="secondary" className="text-xs">
-              Tech {i + 1}
-            </Badge>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => (
-      <Button variant="outline" size="sm" asChild>
-        <Link href={`/team/schedule/${row.original.id}`}>
-          View
-        </Link>
-      </Button>
-    ),
-  },
-];
+      ),
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/team/schedule/${row.original.id}`}>View</Link>
+        </Button>
+      ),
+    },
+  ];
   const table = useReactTable({
-    data: installs,
+    data: filteredData, // Use the filtered data
     columns,
     state: {
       globalFilter,
@@ -97,72 +108,152 @@ const columns = [
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    globalFilterFn: (row, columnId, filterValue) => {
+      const searchStr = filterValue.toLowerCase();
+      return (
+        row.original.name.toLowerCase().includes(searchStr) ||
+        row.original.jobType.toLowerCase().includes(searchStr) ||
+        row.original.technician.some((t) => t.toLowerCase().includes(searchStr))
+      );
+    },
   });
 
   return (
     <div className="py-4 px-4 space-y-4">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search installs..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-9 max-w-md"
+            className="pl-9"
           />
         </div>
-      
+
+        <div className="flex items-center gap-2 w-full md:w-auto">
+        
+          <Select
+            value={statusFilter}
+            onValueChange={setStatusFilter} // Fixed this line
+          >
+            <SelectTrigger className="w-full md:w-40">
+              <SelectValue placeholder="Select status..." />
+            </SelectTrigger>
+            <SelectContent >
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
+              <SelectItem value="complete">Complete</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+      {isMobile ? (
+        // Mobile Card View
+        <div className="grid gap-4">
+          {table.getRowModel().rows?.map((row) => (
+            <div key={row.id} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{row.original.name}</div>
+                <Badge
+                  variant={
+                    row.original.status === "complete"
+                      ? "success"
+                      : row.original.status === "scheduled"
+                      ? "default"
+                      : "warning"
+                  }
+                  className="capitalize"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+                  {row.original.status}
+                </Badge>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="capitalize">
+                    {row.original.jobType}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {new Date(row.original.start).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-1">
+                  {row.original.technician.map((tech, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      Tech {i + 1}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <Button variant="outline" size="sm" className="w-full" asChild>
+                <Link href={`/team/schedule/${row.original.id}`}>
+                  View Details
+                </Link>
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // Desktop Table View
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
+      {/* Pagination (works for both views) */}
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"

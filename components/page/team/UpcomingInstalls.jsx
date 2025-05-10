@@ -42,14 +42,14 @@ export default function UpcomingInstalls({ jobs, members }) {
       header: "Technicians",
       cell: (info) => (
         <div className="flex flex-wrap gap-1">
-          {getTechNames(info.getValue(), members).map((name, index) => (
+          {getTechNames(info.getValue(), members).map((tech, index) => (
             <Badge
               key={index}
               variant="secondary"
               className="text-xs flex items-center gap-1"
             >
               <User className="h-3 w-3" />
-              <span className="truncate max-w-[80px]">{name}</span>
+              <span className="truncate max-w-[80px]">{tech.name}</span>
             </Badge>
           ))}
         </div>
@@ -177,15 +177,16 @@ export default function UpcomingInstalls({ jobs, members }) {
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {getTechNames(job.technician, members).map(
-                        (name, index) => (
+                        (tech, index) => (
+                          
                           <Badge
                             key={index}
                             variant="secondary"
                             className="text-xs flex items-center gap-1"
                           >
-                            <User className="h-3 w-3" />
+                         
                             <span className="truncate max-w-[80px]">
-                              {name}
+                              {tech.name}
                             </span>
                           </Badge>
                         )

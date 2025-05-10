@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { isToday, parseISO, formatDistanceToNow, isTomorrow } from "date-fns";
 import { Clock } from "lucide-react";
 import CompleteJobDialog from "./schedule/CompleteJobDialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SingleSchedulePage({ install }) {
   const { getTechNames, members } = useTeam();
@@ -26,7 +27,7 @@ export default function SingleSchedulePage({ install }) {
   const { user } = useUser();
   console.log("install", install);
 
-  const isComplete = install.status === "complete"
+  const isComplete = install.status === "complete";
 
   // Format date and time
   const formattedDate = new Date(install.start).toLocaleDateString("en-US", {
@@ -116,9 +117,9 @@ export default function SingleSchedulePage({ install }) {
               Check In
             </Button>
             <div className="ml-2 flex items-center gap-2 text-primary-muted">
-              <Clock className="size-4"/><p>{getTimeUntil(install.start)}</p>
+              <Clock className="size-4" />
+              <p>{getTimeUntil(install.start)}</p>
             </div>
-            
           </div>
           {isOnSite && (
             <Button
@@ -137,10 +138,14 @@ export default function SingleSchedulePage({ install }) {
         </div>
         {/* Action Buttons - Moved to the top */}
         <div className="flex gap-3  mb-6 justify-between">
-          <Button variant="outline" className=" text-sm font-medium " disabled={isComplete}>
+          <Button
+            variant="outline"
+            className=" text-sm font-medium "
+            disabled={isComplete}
+          >
             Edit Job
           </Button>
-          <CompleteJobDialog installId={install.id} isComplete={isComplete}/>
+          <CompleteJobDialog installId={install.id} isComplete={isComplete} />
         </div>
       </div>
 
@@ -180,15 +185,23 @@ export default function SingleSchedulePage({ install }) {
                 value={install.address}
                 className="md:col-span-2"
               />
-              <div className="w-full border-t items-start">
-                <h1 className="text-sm text-muted-foreground">Technician(s)</h1>
-                {getTechNames(install.technician, members).map(
-                  (name, index) => (
-                    <div key={index}>
-                      {name} {name.imageUrl}
-                    </div>
-                  )
-                )}
+              <div>
+                <h1 className="font-medium underline decoration-secondary">
+                  Technician(s):
+                </h1>
+                <div className="flex gap-4 flex-wrap">
+                  {getTechNames(install.technician, members).map(
+                    (tech, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarImage src={tech.imageUrl} />
+                          <AvatarFallback>U</AvatarFallback>
+                        </Avatar>
+                        <Badge>{tech.name}</Badge>
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -204,7 +217,7 @@ export default function SingleSchedulePage({ install }) {
               </span>
             </CardTitle>
           </CardHeader>
-          <CardContent >
+          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InfoItem icon={User} label="Name" value={install.name} />
               <InfoItem icon={Phone} label="Phone" value={install.phone} />

@@ -173,7 +173,7 @@ export default function Contact() {
 
                 {/* City Selector */}
                 <div className="space-y-2">
-                  <Label>Service Area</Label>
+                  <Label>City</Label>
                   <Controller
                     name="city"
                     control={control}

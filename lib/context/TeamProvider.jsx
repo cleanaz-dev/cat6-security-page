@@ -57,14 +57,16 @@ export default function TeamProvider({ data, children }) {
     return `${firstName} ${lastInitial}.`;
   };
 
-  const getTechNames = (technician, members) => {
-    return technician
-      .map(techId => {
-        const member = members.find(member => member.id === techId);
-        return member ? formatName(member.fullName) : null;
-      })
-      .filter(name => name);
-  };
+  const getTechNames = (technicianIds, members) => {
+  return technicianIds.map(id => {
+    const member = members.find(m => m.id === id);
+
+    return {
+      name: formatName(member?.fullName || 'Unknown'),
+      imageUrl: member?.imageUrl || '/placeholder.png',
+    };
+  });
+};
   const handleNewTicket = async (data) => {
     try {
       const response = await fetch("/api/team/tickets",{
