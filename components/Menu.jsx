@@ -20,7 +20,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { LogOut } from "lucide-react";
-import { ThemeChanger } from "@/lib/hooks/useTheme";
+import { NavThemeChanger, ThemeChanger } from "@/lib/hooks/useTheme";
 
 export default function Menu({ user }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,9 +50,9 @@ export default function Menu({ user }) {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 text-background">
-          <div className="bg-background p-0.5 rounded-full opacity-50">
-          <ThemeChanger />
-          </div>
+        
+          <NavThemeChanger />
+          
          
           {navItems.map((item) => (
             <Link
