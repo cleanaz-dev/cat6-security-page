@@ -29,11 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTeam } from "@/lib/context/TeamProvider";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function TeamInstalls({ installs }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState("all");
+  const [statusFilter, setStatusFilter] = React.useState("scheduled");
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { getTechNames, members } = useTeam();
 
   const filteredData = React.useMemo(() => {
     if (statusFilter === "all") return installs;
@@ -47,44 +50,66 @@ export default function TeamInstalls({ installs }) {
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
           <div className="font-medium">{row.original.name}</div>
+          <p className="text-muted-foreground text-xs">
+            Install ID: {row.original.id.slice(0, 6)}
+          </p>
+        </div>
+      ),
+    },
+
+    {
+      accessorKey: "jobDetails",
+      header: "Job Details",
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-medium capitalize">
+            {row.original.jobType}
+          </span>
+          <span className="text-xs text-muted-foreground mt-0.5">
+            {new Date(row.original.start).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "techs",
+      header: "Techs",
+      cell: ({ row }) => {
+        const techDetails = getTechNames(row.original.technician, members);
+
+        return (
+          <div>
+            <div className="flex flex-wrap gap-1">
+              {techDetails.map((tech, i) => (
+                <Badge key={i} variant="secondary" className="text-xs">
+                  {tech.name}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1">
           <Badge
             variant={
               row.original.status === "complete"
                 ? "success"
                 : row.original.status === "scheduled"
-                ? "default"
+                ? "secondary"
                 : "warning"
             }
-            className="w-fit capitalize"
+            className="w-fit text-xs capitalize mt-1"
           >
             {row.original.status}
           </Badge>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "jobDetails",
-      header: "Job Details",
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="capitalize">
-              {row.original.jobType}
-            </Badge>
-            <div className="text-sm text-muted-foreground">
-              {new Date(row.original.start).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              })}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {row.original.technician.map((tech, i) => (
-              <Badge key={i} variant="secondary" className="text-xs">
-                Tech {i + 1}
-              </Badge>
-            ))}
-          </div>
         </div>
       ),
     },
@@ -93,7 +118,9 @@ export default function TeamInstalls({ installs }) {
       header: "Actions",
       cell: ({ row }) => (
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/team/schedule/${row.original.id}`}>View</Link>
+          <Link href={`/team/schedule/${row.original.id}`}>
+            <span className="text-xs">View</span>
+          </Link>
         </Button>
       ),
     },
@@ -132,7 +159,6 @@ export default function TeamInstalls({ installs }) {
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto">
-        
           <Select
             value={statusFilter}
             onValueChange={setStatusFilter} // Fixed this line
@@ -140,7 +166,7 @@ export default function TeamInstalls({ installs }) {
             <SelectTrigger className="w-full md:w-40">
               <SelectValue placeholder="Select status..." />
             </SelectTrigger>
-            <SelectContent >
+            <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
               <SelectItem value="confirmed">Confirmed</SelectItem>
@@ -223,21 +249,23 @@ export default function TeamInstalls({ installs }) {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell

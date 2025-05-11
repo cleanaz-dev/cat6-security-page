@@ -10,7 +10,8 @@ import TeamInstalls from "./schedule/TeamInstalls";
 export default function TeamSchedule() {
   const { installs = [] } = useTeam();
   const [showCalendar, setShowCalendar] = useState(false);
-
+const sortedInstalls = installs.sort((a, b) => 
+  new Date(a.start) - new Date(b.start));
   return (
     <div className="flex flex-col min-h-screen">
       <header className="py-6 px-4 flex justify-between">
@@ -32,7 +33,7 @@ export default function TeamSchedule() {
       {showCalendar ? (
         <TeamCalendar installs={installs} />
       ) : (
-        <TeamInstalls installs={installs} />
+        <TeamInstalls installs={sortedInstalls} />
       )}
     </div>
   );

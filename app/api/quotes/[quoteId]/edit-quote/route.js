@@ -12,7 +12,7 @@ export async function POST(req, { params }) {
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-     console.log("Step 1 Success - Validate User");
+    //  console.log("Step 1 Success - Validate User");
     const { quoteId } = await params;
 
     const quote = await getQuoteById(quoteId);
@@ -22,7 +22,7 @@ export async function POST(req, { params }) {
     if (!quote) {
       return NextResponse.json({ error: "Quote not found" }, { status: 404 });
     }
-    console.log("Step 2 Success - Validate Quote");
+    // console.log("Step 2 Success - Validate Quote");
     // Get items from request body
     const { items } = await req.json();
 
@@ -35,13 +35,13 @@ export async function POST(req, { params }) {
         quantity: item.quantity,
       }))
     );
-    console.log("Step 3 Success - Get Stripe Quote");
+    // console.log("Step 3 Success - Get Stripe Quote");
 
      const total = items.reduce((sum, p) => sum + p.price * p.quantity, 0);
 
     const { url } = await uploadPdfToCloudinary(finalizedQuote.pdf_buffer);
 
-    console.log("Step 4 Success - Upload PDF");
+    // console.log("Step 4 Success - Upload PDF");
 
     // Update Redis 
     await redis.json.set(`quoteId:${quote.id}`, "$", {

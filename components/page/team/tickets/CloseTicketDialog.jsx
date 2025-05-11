@@ -13,11 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function CloseTicketDialog({ ticketId }) {
   const [sendSurvey, setSendSurvey] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false)
+  const { push } = useRouter()
 
   const handleCloseTicket = async () => {
     setLoading(true);
@@ -36,6 +38,7 @@ export default function CloseTicketDialog({ ticketId }) {
 
       toast.success("Ticket closed successfully");
       setOpen(false);
+      push("/team/tickets")
     } catch (error) {
       console.error(error);
       toast.error("Error closing ticket");

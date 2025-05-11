@@ -124,9 +124,9 @@ export function SelectedInstallationDialog({
               <div>
                 <Label><span className="text-primary-muted">Technician(s)</span></Label>
                 <div className="mt-1">
-                  {getTechNames(technician, members).map((name, index) => (
+                  {getTechNames(technician, members).map((tech, index) => (
                     <div key={index} >
-                      {name}
+                      {tech.name}
                     </div>
                   ))}
                 </div>

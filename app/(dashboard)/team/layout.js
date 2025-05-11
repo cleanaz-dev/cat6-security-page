@@ -22,7 +22,7 @@ export default async function TeamLayout({ children }) {
       imageUrl: user.imageUrl
     }))
 
-
+// console.log("installs", installs)
    
   return (
     <div>

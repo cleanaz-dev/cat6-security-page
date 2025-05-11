@@ -33,9 +33,9 @@ export default function UpcomingInstalls({ jobs, members }) {
     columnHelper.accessor("jobType", {
       header: "Type",
       cell: (info) => (
-        <Badge variant="outline" className="capitalize">
+        <p className="capitalize font-medium">
           {info.getValue().toLowerCase()}
-        </Badge>
+        </p>
       ),
     }),
     columnHelper.accessor("technician", {
@@ -48,7 +48,7 @@ export default function UpcomingInstalls({ jobs, members }) {
               variant="secondary"
               className="text-xs flex items-center gap-1"
             >
-              <User className="h-3 w-3" />
+            
               <span className="truncate max-w-[80px]">{tech.name}</span>
             </Badge>
           ))}

@@ -112,7 +112,8 @@ export default function TeamCalendar({ installs }) {
             dateClick={handleDateClick}
             eventClick={handleEventClick}
             eventContent={(eventInfo) => (
-              <div className="flex mx-auto justify-center items-center p-1 text-center">
+              <div className="flex mx-auto justify-center items-center p-1 text-center ">
+                
                 <Cctv className="text-primary" /> 
               </div>
             )}

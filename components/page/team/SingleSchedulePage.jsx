@@ -25,7 +25,7 @@ export default function SingleSchedulePage({ install }) {
   const [isOnSite, setIsOnSite] = useState();
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
-  console.log("install", install);
+
 
   const isComplete = install.status === "complete";
 
@@ -48,7 +48,7 @@ export default function SingleSchedulePage({ install }) {
 
   // Unified info item component for consistent styling
   const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
-    <div className={`flex items-start gap-3 ${className}`}>
+    <div className={`flex items-start gap-2 ${className}`}>
       <Icon className="size-4 mt-0.5 text-foreround flex-shrink-0" />
       <div>
         <p className="text-sm text-muted-foreground">{label}</p>
@@ -186,7 +186,7 @@ export default function SingleSchedulePage({ install }) {
                 className="md:col-span-2"
               />
               <div>
-                <h1 className="font-medium underline decoration-secondary">
+                <h1 className="font-medium underline decoration-secondary mb-2">
                   Technician(s):
                 </h1>
                 <div className="flex gap-4 flex-wrap">
