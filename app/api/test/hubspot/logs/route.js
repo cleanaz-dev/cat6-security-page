@@ -40,7 +40,7 @@ export async function POST(req) {
       activities,
     };
 
-    console.log("first time activity fetch:", payload);
+    // console.log("first time activity fetch:", payload);
 
     await redis.set(cacheKey, JSON.stringify(payload), { ex: 60 * 60 });
 
