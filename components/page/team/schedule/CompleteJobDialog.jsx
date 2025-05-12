@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function CompleteJobDialog({ installId, isComplete }) {
+export default function CompleteJobDialog({ installId, isComplete, isCancelled }) {
   const [open, setOpen] = useState(false);
   const [sendSurvey, setSendSurvey] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function CompleteJobDialog({ installId, isComplete }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" disabled={isComplete}>Mark as Complete</Button>
+        <Button variant="default" disabled={isComplete || isCancelled}>Mark as Complete</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -65,7 +65,7 @@ export default function CompleteJobDialog({ installId, isComplete }) {
           <Button
             variant="secondary"
             onClick={handleComplete}
-            disabled={loading}
+            disabled={loading || isComplete || isCancelled}
           >
             {loading ? "Completing..." : "Complete Job"}
           </Button>

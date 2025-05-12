@@ -19,6 +19,7 @@ import { isToday, parseISO, formatDistanceToNow, isTomorrow } from "date-fns";
 import { Clock } from "lucide-react";
 import CompleteJobDialog from "./schedule/CompleteJobDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CancelInstallDialog from "./schedule/CancelInstallDialog";
 
 export default function SingleSchedulePage({ install }) {
   const { getTechNames, members } = useTeam();
@@ -26,8 +27,8 @@ export default function SingleSchedulePage({ install }) {
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
 
-
   const isComplete = install.status === "complete";
+  const isCancelled = install.status === "cancelled";
 
   // Format date and time
   const formattedDate = new Date(install.start).toLocaleDateString("en-US", {
@@ -96,9 +97,15 @@ export default function SingleSchedulePage({ install }) {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold tracking-tight">Job Details</h1>
         <Badge
-          variant={install.status === "completed" ? "default" : "secondary"}
+          variant={
+            install.status === "completed"
+              ? "default"
+              : install.status === "cancelled"
+              ? "destructive"
+              : "secondary"
+          }
         >
-          {install.status}
+          <span className="capitalize">{install.status}</span>
         </Badge>
       </div>
       <div className="flex flex-col md:flex-row md:justify-between">
@@ -138,14 +145,23 @@ export default function SingleSchedulePage({ install }) {
         </div>
         {/* Action Buttons - Moved to the top */}
         <div className="flex gap-3  mb-6 justify-between">
+          <CancelInstallDialog
+            installId={install.id}
+            isComplete={isComplete}
+            isCancelled={isCancelled}
+          />
           <Button
             variant="outline"
             className=" text-sm font-medium "
-            disabled={isComplete}
+            disabled={isComplete || isCancelled}
           >
             Edit Job
           </Button>
-          <CompleteJobDialog installId={install.id} isComplete={isComplete} />
+          <CompleteJobDialog
+            installId={install.id}
+            isComplete={isComplete}
+            isCancelled={isCancelled}
+          />
         </div>
       </div>
 

@@ -48,7 +48,6 @@ export default function UpcomingInstalls({ jobs, members }) {
               variant="secondary"
               className="text-xs flex items-center gap-1"
             >
-            
               <span className="truncate max-w-[80px]">{tech.name}</span>
             </Badge>
           ))}
@@ -57,11 +56,19 @@ export default function UpcomingInstalls({ jobs, members }) {
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => (
-        <Badge variant="secondary" className="capitalize">
-          {info.getValue().toLowerCase()}
-        </Badge>
-      ),
+      cell: (info) => {
+        const status = info.getValue()?.toLowerCase();
+        const isCancelled = status === "cancelled";
+
+        return (
+          <Badge
+            variant={isCancelled ? "destructive" : "secondary"}
+            className="capitalize"
+          >
+            {status}
+          </Badge>
+        );
+      },
     }),
     columnHelper.display({
       id: "actions",
@@ -79,20 +86,16 @@ export default function UpcomingInstalls({ jobs, members }) {
     getCoreRowModel: getCoreRowModel(),
   });
 
-
   return (
     <Card className="bg-background border-none shadow-none">
       <CardHeader className="">
         <CardTitle className="text-lg font-semibold flex flex-col sm:flex-row sm:items-center gap-2">
-        <div className="flex flex-col md:flex-row justify-between items-center w-full">
+          <div className="flex flex-col md:flex-row justify-between items-center w-full">
             <div className="flex items-center gap-2">
               {" "}
               <Wrench className="h-5 w-5 text-primary" />
               <span className="text-xl sm:text-2xl">Upcoming Jobs</span>{" "}
-              <Badge
-                variant="outline"
-                className=""
-              >
+              <Badge variant="outline" className="">
                 {jobs.length} scheduled
               </Badge>
             </div>
@@ -178,13 +181,11 @@ export default function UpcomingInstalls({ jobs, members }) {
                     <div className="flex flex-wrap gap-1">
                       {getTechNames(job.technician, members).map(
                         (tech, index) => (
-                          
                           <Badge
                             key={index}
                             variant="secondary"
                             className="text-xs flex items-center gap-1"
                           >
-                         
                             <span className="truncate max-w-[80px]">
                               {tech.name}
                             </span>

@@ -104,7 +104,8 @@ export default function TeamInstalls({ installs }) {
                 ? "success"
                 : row.original.status === "scheduled"
                 ? "secondary"
-                : "warning"
+                : row.original.status === "cancelled"
+                ? "destructive" : "secondary"
             }
             className="w-fit text-xs capitalize mt-1"
           >
