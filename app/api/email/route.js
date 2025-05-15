@@ -84,7 +84,7 @@ export async function POST(req) {
       })
     );
 
-    await logHubSpotEmail()
+    // await logHubSpotEmail()
 
     // Log success
     console.log('Email sent:', {
