@@ -112,7 +112,7 @@ export default function Hero() {
                   <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <CameraDemoDialog />
+              {/* <CameraDemoDialog /> */}
             </div>
           </div>
 
@@ -146,7 +146,7 @@ export default function Hero() {
               <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
-          <CameraDemoDialog />
+          {/* <CameraDemoDialog /> */}
         </div>
       </div>
     </section>
