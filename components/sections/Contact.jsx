@@ -19,7 +19,7 @@ import {
   projectTypes,
   timeline,
   cities,
-  budgets
+  budgets,
 } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
@@ -47,7 +47,7 @@ export default function Contact() {
     defaultValues: {
       name: "",
       email: "",
-      budget:"",
+      budget: "",
       phone: "",
       city: "",
       customCity: "",
@@ -160,8 +160,10 @@ export default function Contact() {
                     <Label htmlFor="name">Name</Label>
                     <Input
                       id="name"
+                      name="name"
                       {...register("name")}
                       placeholder="John Doe"
+                      autoComplete="on"
                     />
                     {errors.name && (
                       <p className="text-sm text-rose-500">
@@ -173,16 +175,19 @@ export default function Contact() {
 
                 {/* City Selector */}
                 <div className="space-y-2">
-                  <Label>City</Label>
+                  <Label htmlFor="city-select">City</Label>
                   <Controller
+                    id="city"
                     name="city"
                     control={control}
                     render={({ field }) => (
                       <Select
+                        id="city"
+                        name="city"
                         onValueChange={field.onChange}
                         value={field.value}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger id="city-select">
                           <SelectValue placeholder="Select your city" />
                         </SelectTrigger>
                         <SelectContent className="bg-background">
@@ -203,7 +208,7 @@ export default function Contact() {
 
                   {watch("city") === "Other" && (
                     <div className="mt-2">
-                      <Label>Specify City</Label>
+                      <Label htmlFor="custom-city-input">Specify City</Label>
                       <Input
                         {...register("customCity")}
                         placeholder="Enter your city"
@@ -221,10 +226,12 @@ export default function Contact() {
                 <div className="space-y-2">
                   <Label htmlFor="budget">Budget</Label>
                   <Select
+                    id="budget"
+                    name="budget"
                     onValueChange={(value) => setValue("budget", value)}
                     value={watch("budget")}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="budget" name="budget">
                       <SelectValue placeholder="Select your budget" />
                     </SelectTrigger>
                     <SelectContent className="bg-background">
@@ -247,9 +254,11 @@ export default function Contact() {
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     {...register("email")}
                     placeholder="john.doe@example.com"
+                    autoComplete="on"
                   />
                   {errors.email && (
                     <p className="text-sm text-rose-500">
@@ -261,9 +270,11 @@ export default function Contact() {
                   <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
+                    name="phone"
                     type="tel"
                     {...register("phone")}
                     placeholder="(123) 456-7890"
+                    autoComplete="on"
                   />
                   {errors.phone && (
                     <p className="text-sm text-rose-500">
@@ -275,12 +286,13 @@ export default function Contact() {
                 {/* Sales-Focused Selects */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Project Type</Label>
+                    <Label htmlFor="projectType">Project Type</Label>
                     <Select
+                    id="projectType" name="projectType"
                       onValueChange={(value) => setValue("projectType", value)}
                       value={watch("projectType")}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="projectType" name="projectType">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent className="bg-background">
@@ -298,12 +310,13 @@ export default function Contact() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label>Estimated Cameras</Label>
+                    <Label htmlFor="camera-count">Estimated Cameras</Label>
                     <Select
+                    id="camera-count" name="camera-count"
                       onValueChange={(value) => setValue("cameraCount", value)}
                       value={watch("cameraCount")}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="camera-count" name="camera-count">
                         <SelectValue placeholder="Choose amount" />
                       </SelectTrigger>
                       <SelectContent className="bg-background">
@@ -322,15 +335,16 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* Time & Features */}
+                {/* Timeline */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Timeline to Install</Label>
+                    <Label htmlFor="timeline">Timeline to Install</Label>
                     <Select
+                      id="timeline" name="timeline"
                       onValueChange={(value) => setValue("timeline", value)}
                       value={watch("timeline")}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="timeline" name="timeline">
                         <SelectValue placeholder="Select timeline" />
                       </SelectTrigger>
                       <SelectContent className="bg-background">
@@ -347,10 +361,17 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
+                  {/* Special Features */}
                   <div className="space-y-2">
-                    <Label>Special Features</Label>
-                    <Select onValueChange={handleFeatureToggle}>
-                      <SelectTrigger>
+                    <Label htmlFor="special-features">Special Features</Label>
+                    <Select 
+                      id="special-features"
+                        name="special-features"
+                    onValueChange={handleFeatureToggle}>
+                      <SelectTrigger
+                        id="special-features"
+                        name="special-features"
+                      >
                         <SelectValue placeholder="Any priorities?" />
                       </SelectTrigger>
                       <SelectContent className="bg-background">
@@ -418,6 +439,7 @@ export default function Contact() {
                   <Label htmlFor="message">Message</Label>
                   <Textarea
                     id="message"
+                    name="message"
                     {...register("message")}
                     placeholder="Provide more information if you'd like..."
                     className="min-h-[120px]"

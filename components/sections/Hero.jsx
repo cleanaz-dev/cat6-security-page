@@ -8,19 +8,21 @@ import { Button } from "@/components/ui/button";
 import heroImg1 from "@/public/images/hero-1.png";
 import heroImg2 from "@/public/images/hero-2.png";
 import heroImg3 from "@/public/images/hero-3.png";
-import { CameraDemoDialog } from "../CameraDemoDialog";
+
 
 export default function Hero() {
   const [currentImage, setCurrentImage] = useState(0);
   const images = [heroImg1, heroImg2, heroImg3];
   const transitionDuration = 5
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 10000); // Change image every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
+useEffect(() => {
+  const rotateImage = () => {
+    setCurrentImage((prev) => (prev + 1) % images.length);
+  };
+
+  const interval = setInterval(rotateImage, 10000);
+  return () => clearInterval(interval);
+}, [images.length]);
   
   return (
     <section
@@ -112,7 +114,7 @@ export default function Hero() {
                   <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-              {/* <CameraDemoDialog /> */}
+        
             </div>
           </div>
 
