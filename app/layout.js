@@ -17,10 +17,19 @@ const orbitron = Orbitron({
 
 export const metadata = {
   title: "Cat6 Security | Expert CCTV & Security Camera Installation",
-  description:
-    "Professional security camera installation for homes & businesses. High-quality CCTV systems, smart home integration, and 24/7 monitoring solutions.",
-  icons: {
-    icon: "/app/favicon.ico", // Path relative to the `public/` folder
+  description: "Professional security camera installation for homes & businesses. High-quality CCTV systems, smart home integration, and 24/7 monitoring solutions.",
+  icons: { icon: "/app/favicon.ico" },
+  
+  // Add this to ensure indexing:
+  robots: {
+    index: true,    // Allow search engines to index this page
+    follow: true,   // Allow crawling links on the page
+    nocache: false, // Optional: Prevents caching if true
+  },
+  
+  // Optional: Set canonical URL (good for SEO)
+  alternates: {
+    canonical: "https://cat6security.com", // Replace with your actual domain
   },
 };
 
