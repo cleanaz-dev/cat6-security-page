@@ -11,6 +11,7 @@ const testimonials = [
     name: "Michael Johnson",
     role: "Owner, Johnson's Electronics",
     stars: 5,
+    imgUrl: "https://res.cloudinary.com/dmllgn0t7/image/upload/v1747802594/michael-johnson--headshot_dxkveb.png"
   },
   {
     id: 2,
@@ -19,6 +20,7 @@ const testimonials = [
     name: "Sarah Williams",
     role: "Operations Manager, Williams Distribution",
     stars: 5,
+    imgUrl: "https://res.cloudinary.com/dmllgn0t7/image/upload/v1747802593/sarah-williams--headshot-_fooqvd.png"
   },
   {
     id: 3,
@@ -27,6 +29,7 @@ const testimonials = [
     name: "David Chen",
     role: "IT Director, Chen Enterprises",
     stars: 5,
+    imgUrl: "https://res.cloudinary.com/dmllgn0t7/image/upload/v1747802593/david-chen--headshot-_gi930r.png"
   },
 ];
 
@@ -86,7 +89,7 @@ export default function Testimonials() {
                 <div className="rounded-full bg-slate-100">
                   <Avatar>
                     <AvatarImage
-                      src="https://github.com/shadcn.png"
+                      src={testimonial.imgUrl}
                       alt="@shadcn"
                     />
                     <AvatarFallback>CN</AvatarFallback>
