@@ -108,6 +108,13 @@ export default function UpcomingInstalls({ jobs, members }) {
         </CardTitle>
       </CardHeader>
       <CardContent>
+         {jobs.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p className="text-lg">No upcoming jobs scheduled</p>
+            <p className="text-sm mt-2">Check back later or create a new job</p>
+          </div>
+        ) : (
+          <>
         {/* Desktop Table */}
         <div className="hidden md:block">
           <table className="w-full">
@@ -205,6 +212,8 @@ export default function UpcomingInstalls({ jobs, members }) {
             </div>
           ))}
         </div>
+             </>
+        )}
       </CardContent>
     </Card>
   );

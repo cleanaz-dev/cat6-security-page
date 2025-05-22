@@ -16,7 +16,7 @@ export default function TeamPage() {
       <Members members={members} />
       <UpcomingInstalls
         members={members}
-        jobs={installs.filter((i) => i.status !== "complete")}
+        jobs={installs.filter(i => i.status !== "complete" && i.status !== "cancelled")}
       />
       <OpenTickets openTickets={openTickets} />
     </>

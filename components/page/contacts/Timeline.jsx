@@ -2,7 +2,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useContact } from "@/lib/context/ContactProvider";
-import { MailCheck, Mail, Phone, Handshake, Construction, NotebookPen } from "lucide-react";
+import { MailCheck, Mail, Phone, Handshake, Construction, NotebookPen, AtSign } from "lucide-react";
+import { FileWarning } from "lucide-react";
 
 export default function TimelinePage({ contact }) {
   const [activities, setActivities] = useState([]);
@@ -73,7 +74,7 @@ export default function TimelinePage({ contact }) {
               ? "Job Updated"
               : "Note Added",
             description: body,
-            icon: isQuote ? <MailCheck /> : isJob ? <Construction /> : <NotebookPen />,
+            icon: isQuote ? <FileWarning /> : isJob ? <Construction /> : <NotebookPen />,
           };
         }
         // Call Activity
@@ -138,10 +139,11 @@ export default function TimelinePage({ contact }) {
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg mr-2">{event.icon}</span>
-                  <span className="font-medium text-foreground underline decoration-primary">
+                 <span className=" mr-2">{event.icon}</span>
+                  <span className="font-medium text-lg text-foreground underline decoration-primary">
                     {event.title}
                   </span>
+                   
                 </div>
                 <span className="text-sm text-muted-foreground">
                   {new Date(event.date).toLocaleDateString("en-US", {
