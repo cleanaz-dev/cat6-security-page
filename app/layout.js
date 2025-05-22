@@ -16,7 +16,7 @@ const orbitron = Orbitron({
 });
 
 export const metadata = {
-  title: "Cat6 Security | Expert CCTV & Security Camera Installation",
+  title: "Cat6 Security",
   description:
     "Professional security camera installation for homes & businesses. High-quality CCTV systems, smart home integration, and 24/7 monitoring solutions.",
   icons: { icon: "/favicon.ico" },
@@ -27,6 +27,13 @@ export const metadata = {
     follow: true, // Allow crawling links on the page
     nocache: false, // Optional: Prevents caching if true
   },
+
+    openGraph: {
+    title: "Cat6 Security | Expert CCTV & Security Camera Installation",
+    siteName: "Cat6 Security",
+  },
+  
+  
 
   // Optional: Set canonical URL (good for SEO)
   alternates: {
