@@ -1,11 +1,11 @@
-import { Inter, Orbitron } from "next/font/google";
+import { Orbitron } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const inter = Inter({ subsets: ["latin"] });
+
 const orbitron = Orbitron({
   subsets: ["latin"],
   weightRange: ["400", "500", "600", "700", "800", "900"],
@@ -35,10 +35,10 @@ export const metadata = {
   
   
 
-  // Optional: Set canonical URL (good for SEO)
-  alternates: {
-    canonical: "https://cat6security.com", // Replace with your actual domain
-  },
+  // // Optional: Set canonical URL (good for SEO)
+  // alternates: {
+  //   canonical: "https://cat6security.com", // Replace with your actual domain
+  // },
 };
 
 export default function RootLayout({ children }) {

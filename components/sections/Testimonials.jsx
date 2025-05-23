@@ -8,7 +8,7 @@ const testimonials = [
     id: 1,
     quote:
       "Cat6 Security transformed our retail store's security system. The cameras are discreet yet effective, and the mobile access allows me to monitor my business from anywhere. Their team was professional and completed the installation ahead of schedule.",
-    name: "Michael Johnson",
+    name: "Anthony Johnson",
     role: "Owner, Johnson's Electronics",
     stars: 5,
     imgUrl: "https://res.cloudinary.com/dmllgn0t7/image/upload/v1747802594/michael-johnson--headshot_dxkveb.png"

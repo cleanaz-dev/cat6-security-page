@@ -28,7 +28,7 @@ import { SuccessDialog } from "@/components/SuccessDialog";
 
 export default function Contact() {
   const [selectedFeatures, setSelectedFeatures] = useState([]);
-  const [hoveredFeature, setHoveredFeature] = useState(null);
+  // const [hoveredFeature, setHoveredFeature] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
@@ -45,33 +45,34 @@ export default function Contact() {
   } = useForm({
     resolver: zodResolver(ContactFormSchema),
     defaultValues: {
-      name: "",
+      firstname: "",
+      lastname: "",
       email: "",
-      budget: "",
+      // budget: "",
       phone: "",
       city: "",
-      customCity: "",
-      projectType: "",
-      cameraCount: "",
-      timeline: "",
+      // customCity: "",
+      // projectType: "",
+      // cameraCount: "",
+      // timeline: "",
       message: "",
-      features: [],
+      // features: [],
     },
   });
 
-  const handleFeatureToggle = (featureValue) => {
-    const newFeatures = selectedFeatures.includes(featureValue)
-      ? selectedFeatures.filter((f) => f !== featureValue)
-      : [...selectedFeatures, featureValue];
-    setSelectedFeatures(newFeatures);
-    setValue("features", newFeatures);
-  };
+  // const handleFeatureToggle = (featureValue) => {
+  //   const newFeatures = selectedFeatures.includes(featureValue)
+  //     ? selectedFeatures.filter((f) => f !== featureValue)
+  //     : [...selectedFeatures, featureValue];
+  //   setSelectedFeatures(newFeatures);
+  //   setValue("features", newFeatures);
+  // };
 
-  const removeFeature = (featureValue) => {
-    const newFeatures = selectedFeatures.filter((f) => f !== featureValue);
-    setSelectedFeatures(newFeatures);
-    setValue("features", newFeatures);
-  };
+  // const removeFeature = (featureValue) => {
+  //   const newFeatures = selectedFeatures.filter((f) => f !== featureValue);
+  //   setSelectedFeatures(newFeatures);
+  //   setValue("features", newFeatures);
+  // };
 
   const onSubmit = async (data) => {
     // console.log("Form data:", data);
@@ -132,8 +133,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold">Business Hours</h3>
-                  <p className="text-muted">Monday - Friday: 8am - 6pm</p>
-                  <p className="text-muted">Saturday: 9am - 2pm</p>
+                  <p className="text-muted">Monday - Friday: 8am - 8pm</p>
+                  <p className="text-muted">Saturday: 9am - 5pm</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -155,26 +156,41 @@ export default function Contact() {
             <div className="flex flex-col space-y-4 rounded-lg border bg-background p-6 shadow-lg">
               <div className="grid gap-4">
                 {/* Name Inputs */}
-                <div className="grid  gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">First Name</Label>
                     <Input
-                      id="name"
-                      name="name"
-                      {...register("name")}
-                      placeholder="John Doe"
+                      id="firstname"
+                      name="firstname"
+                      {...register("firstname")}
+                      placeholder="John"
                       autoComplete="on"
                     />
-                    {errors.name && (
+                    {errors.firstname && (
                       <p className="text-sm text-rose-500">
-                        {errors.name.message}
+                        {errors.firstname.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Last Name</Label>
+                    <Input
+                      id="lastname"
+                      name="lastname"
+                      {...register("lastname")}
+                      placeholder="Doe"
+                      autoComplete="on"
+                    />
+                    {errors.lastname && (
+                      <p className="text-sm text-rose-500">
+                        {errors.lastname.message}
                       </p>
                     )}
                   </div>
                 </div>
 
                 {/* City Selector */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="city-select">City</Label>
                   <Controller
                     id="city"
@@ -220,10 +236,10 @@ export default function Contact() {
                       )}
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {/* Budget */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="budget">Budget</Label>
                   <Select
                     id="budget"
@@ -247,7 +263,7 @@ export default function Contact() {
                       {errors.budget.message}
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Contact Info */}
                 <div className="space-y-2">
@@ -284,11 +300,12 @@ export default function Contact() {
                 </div>
 
                 {/* Sales-Focused Selects */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                {/* <div className="grid md:grid-cols-2 gap-4"> */}
+                  {/* <div className="space-y-2">
                     <Label htmlFor="projectType">Project Type</Label>
                     <Select
-                    id="projectType" name="projectType"
+                      id="projectType"
+                      name="projectType"
                       onValueChange={(value) => setValue("projectType", value)}
                       value={watch("projectType")}
                     >
@@ -308,8 +325,9 @@ export default function Contact() {
                         {errors.projectType.message}
                       </p>
                     )}
-                  </div>
-                  <div className="space-y-2">
+                  </div> */}
+                  {/* Camera Count */}
+                  {/* <div className="space-y-2">
                     <Label htmlFor="camera-count">Estimated Cameras</Label>
                     <Select
                     id="camera-count" name="camera-count"
@@ -332,11 +350,11 @@ export default function Contact() {
                         {errors.cameraCount.message}
                       </p>
                     )}
-                  </div>
-                </div>
+                  </div> */}
+                {/* </div> */}
 
                 {/* Timeline */}
-                <div className="grid md:grid-cols-2 gap-4">
+                {/* <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="timeline">Timeline to Install</Label>
                     <Select
@@ -361,7 +379,7 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
-                  {/* Special Features */}
+                
                   <div className="space-y-2">
                     <Label htmlFor="special-features">Special Features</Label>
                     <Select 
@@ -393,10 +411,10 @@ export default function Contact() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Selected Features Display */}
-                {selectedFeatures.length > 0 && (
+                {/* {selectedFeatures.length > 0 && (
                   <div className="space-y-2">
                     <Label>Selected Features</Label>
                     <div className="flex flex-wrap gap-2">
@@ -432,7 +450,7 @@ export default function Contact() {
                       })}
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Message */}
                 <div className="space-y-2">

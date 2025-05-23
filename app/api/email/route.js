@@ -39,6 +39,9 @@ export async function POST(req) {
     console.log("data:", data);
     const validationResult = ContactFormSchema.safeParse(data);
 
+    
+    console.log("validation data,", validationResult.data)
+
     if (!validationResult.success) {
       return NextResponse.json(
         { 
@@ -50,30 +53,38 @@ export async function POST(req) {
       );
     }
 
-    const formData = {
-      contact: {
-        name: validationResult.data.name,
-        email: validationResult.data.email,
-        phone: validationResult.data.phone,
-      },
-      project: {
-        type: validationResult.data.projectType,
-        cameraCount: validationResult.data.cameraCount,
-        timeline: validationResult.data.timeline,
-        message: validationResult.data.message,
-        features: validationResult.data.features,
-        city: validationResult.data.city,
-        customCity: validationResult.data.customCity,
-        budget: validationResult.data.budget,
-      }
-    }
+    // const formData = {
+    //   contact: {
+    //     name: validationResult.data.name,
+    //     email: validationResult.data.email,
+    //     phone: validationResult.data.phone,
+    //   },
+    //   project: {
+    //     type: validationResult.data.projectType,
+    //     cameraCount: validationResult.data.cameraCount,
+    //     timeline: validationResult.data.timeline,
+    //     message: validationResult.data.message,
+    //     features: validationResult.data.features,
+    //     city: validationResult.data.city,
+    //     customCity: validationResult.data.customCity,
+    //     budget: validationResult.data.budget,
+    //   }
+    // }
 
+X
 
     const redisId = randomUUID();
-    console.log("baseUrl:", baseUrl);
+    // console.log("baseUrl:", baseUrl);
     
     // Store tokens with expiration (24 hours)
-    await redis.set(`redisId:${redisId}`, JSON.stringify({ formData }), 'EX', 60 * 60 * 24)
+    await redis.json.set(`redisId:${redisId}`, ".", {
+        firstname: validationResult.data.firstname,
+        lastname: validationResult.data.lastname,
+        email: validationResult.data.email,
+        phone: validationResult.data.phone,
+        message: validationResult.data.message || ""
+    },  'EX', 60 * 60 * 24)
+
 
     // Send email with rate limiting
     const emailResponse = await limiter.schedule(() => 
