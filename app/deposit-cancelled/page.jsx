@@ -1,5 +1,6 @@
-'use client';
+export const dynamic = 'force-dynamic';
 
+'use client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { XCircle, ArrowLeft, RefreshCw, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
