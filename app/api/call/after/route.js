@@ -93,7 +93,7 @@ export async function POST(req) {
         const checkoutSession = await createCheckoutSession({
           uuid,
           email: contactData.email,
-          redirectUrl: `${baseUrl}/deposit-confirmed`,
+          redirectUrl: baseUrl,
         });
 
         // Checkout sessions return the URL directly
