@@ -4,7 +4,8 @@ const blandApiUrl = "https://api.bland.ai/v1/calls";
 const apiKey = process.env.BLAND_API_KEY;
 const voiceId = [
   { id: "fc585787-f5a8-4c3d-a16f-759a895c114a", name: "Faye" },
-  { id: "923ef241-cffc-4b6d-a59a-9c3ec3614d53", name: "Brady" },
+  { id: "85a2c852-2238-4651-acf0-e5cbe02186f2",  name: "Bonnie" },
+  { id: "bb88042c-7858-4875-a686-8e193414ded5", name:"Stella"}
 ];
 
 const baseUrl = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_BASE_URL : process.env.NEXT_PUBLIC_DEV_URL;
@@ -14,22 +15,17 @@ export async function makeCall(data) {
   const randomIndex = Math.floor(Math.random() * voiceId.length);
   const selectedVoice = voiceId[randomIndex];
   const task = callScript
-      .replace(/{{customerName}}/g, data.name)
-      .replace(/{{customerEmail}}/g, data.email)
-      .replace(/{{customerMessage}}/g, data.message || "")
-      .replace(/{{projectType}}/g, data.projectType)
-      .replace(/{{cameraCount}}/g, data.cameraCount)
-      .replace(/{{timeline}}/g, data.timeline)
-      .replace(/{{features}}/g, data.features.join(", "))
-      .replace(/{{city}}/g, data.city)
-      .replace(/{{budget}}/g, data.budget);
+      .replace(/{{firstname}}/g, data.firstname)
+      .replace(/{{lastname}}/g, data.lastname)
+      .replace(/{{email}}/g, data.email)
+      .replace(/{{message}}/g, data.message || "")
 
   try {
     const response = await axios.post(
       blandApiUrl,
       {
         phone_number: data.phone,
-        from: null,
+        from: 14372920555,
         task: task,
         language: "eng",
         model: "turbo",
@@ -41,12 +37,12 @@ export async function makeCall(data) {
         wait_for_greeting: true,
         record: true,
         amd: false,
-        interruption_threshold: 100,
+        interruption_threshold: 50,
         temperature: null,
         transfer_list: {},
         metadata: {
           yourName: selectedVoice.name,
-          redisId: data.redisId,
+          uuid: data.uuid,
         },
         pronunciation_guide: [
           {
@@ -73,12 +69,11 @@ export async function makeCall(data) {
           specialFeatures: "string",
           propertyType: "string",
           timeline: "string",
-          serviceArea: "string",
+          city: "string",
           rescheduledCall: "boolean",
-          addtionalInformation: "string",
           bookZoom: "boolean",
           depositOfferAccepted: "boolean",
-          detailedCallSummary: "string",
+        
         },
         webhook:
           `${baseUrl}/api/call/after`,

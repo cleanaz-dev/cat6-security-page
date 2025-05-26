@@ -5,40 +5,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import {
-  features,
-  numOfCameras,
-  projectTypes,
-  timeline,
-  cities,
-  budgets,
-} from "@/lib/constants";
+import rep2 from "@/public/images/speak-to-rep-1.png";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { ContactFormSchema } from "@/lib/schemas";
 import { SuccessDialog } from "@/components/SuccessDialog";
+import Image from "next/image";
+import { Phone } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion"; // Add this import
+import { UserCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Contact() {
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
-  // const [hoveredFeature, setHoveredFeature] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [initiatingCall, setInitiatingCall] = useState(false);
+  const [showTimeSelection, setShowTimeSelection] = useState(false);
+  const { push } = useRouter();
 
   const {
     register,
     reset,
     handleSubmit,
-    control, // Added for Controller
+    control,
     formState: { errors },
     setValue,
     watch,
@@ -48,55 +42,96 @@ export default function Contact() {
       firstname: "",
       lastname: "",
       email: "",
-      // budget: "",
       phone: "",
       city: "",
-      // customCity: "",
-      // projectType: "",
-      // cameraCount: "",
-      // timeline: "",
       message: "",
-      // features: [],
     },
   });
 
-  // const handleFeatureToggle = (featureValue) => {
-  //   const newFeatures = selectedFeatures.includes(featureValue)
-  //     ? selectedFeatures.filter((f) => f !== featureValue)
-  //     : [...selectedFeatures, featureValue];
-  //   setSelectedFeatures(newFeatures);
-  //   setValue("features", newFeatures);
-  // };
-
-  // const removeFeature = (featureValue) => {
-  //   const newFeatures = selectedFeatures.filter((f) => f !== featureValue);
-  //   setSelectedFeatures(newFeatures);
-  //   setValue("features", newFeatures);
-  // };
-
   const onSubmit = async (data) => {
-    // console.log("Form data:", data);
     setSubmitting(true);
-    setError(null);
     try {
-      const response = await fetch("/api/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to submit form");
-      }
-      setSuccessDialogOpen(true);
-      reset();
-      setSelectedFeatures([]);
-    } catch (error) {
-      setError(error.message);
+      // Your existing form submission logic here
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+
+      // After successful submission:
+      setSubmittedData(data);
+      setFormSubmitted(true);
+      setSuccess(true);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleTimeSelection = async (timeOption) => {
+    setInitiatingCall(true);
+    setError("");
+    let uuid = crypto.randomUUID();
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await fetch("/api/call/make", {
+        method: "POST", // Add the HTTP method
+        headers: {
+          "Content-Type": "application/json", // Correct capitalization
+        },
+        body: JSON.stringify({
+          // Use JSON.stringify to properly format the body
+          ...submittedData,
+          timeOption: timeOption,
+          uuid: uuid,
+        }),
+      });
+
+      const data = await response.json(); // Parse the response
+
+      if (data.success) {
+        // Check the parsed data, not the response object
+
+        push(`/thank-you/${uuid}`); // Use router.push instead of push
+      } else {
+        setError(data.message || "Failed to schedule call. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error scheduling call:", error);
+      setError("Failed to schedule call. Please try again.");
+    } finally {
+      setInitiatingCall(false);
+    }
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeInOut" },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.95,
+      transition: { duration: 0.3 },
+    },
+  };
+
+  const slideVariants = {
+    hidden: { x: 300, opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        damping: 25,
+        stiffness: 120,
+        duration: 0.7,
+      },
+    },
+    exit: {
+      x: -300,
+      opacity: 0,
+      transition: { duration: 0.3 },
+    },
   };
 
   return (
@@ -117,14 +152,6 @@ export default function Contact() {
                 free consultation and quote.
               </p>
             </div>
-            {/*             
-            <Alert className="mb-6">
-              <MapPin className="h-4 w-4" />
-              <AlertTitle>Serving All GTA Areas</AlertTitle>
-              <AlertDescription>
-                Toronto • Mississauga • Brampton • Vaughan • Markham • Richmond Hill
-              </AlertDescription>
-            </Alert> */}
 
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
@@ -153,335 +180,348 @@ export default function Contact() {
 
           {/* Contact Form */}
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col space-y-4 rounded-lg border bg-background p-6 shadow-lg">
-              <div className="grid gap-4">
-                {/* Name Inputs */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">First Name</Label>
-                    <Input
-                      id="firstname"
-                      name="firstname"
-                      {...register("firstname")}
-                      placeholder="John"
-                      autoComplete="on"
-                    />
-                    {errors.firstname && (
-                      <p className="text-sm text-rose-500">
-                        {errors.firstname.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Last Name</Label>
-                    <Input
-                      id="lastname"
-                      name="lastname"
-                      {...register("lastname")}
-                      placeholder="Doe"
-                      autoComplete="on"
-                    />
-                    {errors.lastname && (
-                      <p className="text-sm text-rose-500">
-                        {errors.lastname.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* City Selector */}
-                {/* <div className="space-y-2">
-                  <Label htmlFor="city-select">City</Label>
-                  <Controller
-                    id="city"
-                    name="city"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        id="city"
-                        name="city"
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger id="city-select">
-                          <SelectValue placeholder="Select your city" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background">
-                          {cities.map((city) => (
-                            <SelectItem key={city} value={city}>
-                              {city}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.city && (
-                    <p className="text-sm text-rose-500">
-                      {errors.city.message}
-                    </p>
-                  )}
-
-                  {watch("city") === "Other" && (
-                    <div className="mt-2">
-                      <Label htmlFor="custom-city-input">Specify City</Label>
-                      <Input
-                        {...register("customCity")}
-                        placeholder="Enter your city"
-                      />
-                      {errors.customCity && (
-                        <p className="text-sm text-rose-500">
-                          {errors.customCity.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div> */}
-
-                {/* Budget */}
-                {/* <div className="space-y-2">
-                  <Label htmlFor="budget">Budget</Label>
-                  <Select
-                    id="budget"
-                    name="budget"
-                    onValueChange={(value) => setValue("budget", value)}
-                    value={watch("budget")}
+            <div className="flex flex-col space-y-4 rounded-lg border bg-background p-6 shadow-lg min-h-[550px] overflow-x-hidden">
+              <AnimatePresence mode="wait">
+                {!formSubmitted ? (
+                  <motion.div
+                    key="form"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
                   >
-                    <SelectTrigger id="budget" name="budget">
-                      <SelectValue placeholder="Select your budget" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      {budgets.map((budget) => (
-                        <SelectItem key={budget.id} value={budget.value}>
-                          {budget.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.budget && (
-                    <p className="text-sm text-rose-500">
-                      {errors.budget.message}
-                    </p>
-                  )}
-                </div> */}
+                    {/* Original Form Fields */}
+                    <div className="grid gap-4">
+                      <h1 className="text-center text-xl decoration-primary underline mb-6">
+                        Speak to a Rep Now!
+                      </h1>
+                      {/* Name Inputs */}
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">First Name</Label>
+                          <Input
+                            id="firstname"
+                            name="firstname"
+                            {...register("firstname")}
+                            placeholder="John"
+                            autoComplete="on"
+                          />
+                          {errors.firstname && (
+                            <p className="text-sm text-rose-500">
+                              {errors.firstname.message}
+                            </p>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Last Name</Label>
+                          <Input
+                            id="lastname"
+                            name="lastname"
+                            {...register("lastname")}
+                            placeholder="Doe"
+                            autoComplete="on"
+                          />
+                          {errors.lastname && (
+                            <p className="text-sm text-rose-500">
+                              {errors.lastname.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
 
-                {/* Contact Info */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    {...register("email")}
-                    placeholder="john.doe@example.com"
-                    autoComplete="on"
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-rose-500">
-                      {errors.email.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    {...register("phone")}
-                    placeholder="(123) 456-7890"
-                    autoComplete="on"
-                  />
-                  {errors.phone && (
-                    <p className="text-sm text-rose-500">
-                      {errors.phone.message}
-                    </p>
-                  )}
-                </div>
+                      {/* Contact Info */}
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          {...register("email")}
+                          placeholder="john.doe@example.com"
+                          autoComplete="on"
+                        />
+                        {errors.email && (
+                          <p className="text-sm text-rose-500">
+                            {errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          {...register("phone")}
+                          placeholder="(123) 456-7890"
+                          autoComplete="on"
+                        />
+                        {errors.phone && (
+                          <p className="text-sm text-rose-500">
+                            {errors.phone.message}
+                          </p>
+                        )}
+                      </div>
 
-                {/* Sales-Focused Selects */}
-                {/* <div className="grid md:grid-cols-2 gap-4"> */}
-                  {/* <div className="space-y-2">
-                    <Label htmlFor="projectType">Project Type</Label>
-                    <Select
-                      id="projectType"
-                      name="projectType"
-                      onValueChange={(value) => setValue("projectType", value)}
-                      value={watch("projectType")}
-                    >
-                      <SelectTrigger id="projectType" name="projectType">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        {projectTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.projectType && (
-                      <p className="text-sm text-rose-500">
-                        {errors.projectType.message}
-                      </p>
-                    )}
-                  </div> */}
-                  {/* Camera Count */}
-                  {/* <div className="space-y-2">
-                    <Label htmlFor="camera-count">Estimated Cameras</Label>
-                    <Select
-                    id="camera-count" name="camera-count"
-                      onValueChange={(value) => setValue("cameraCount", value)}
-                      value={watch("cameraCount")}
-                    >
-                      <SelectTrigger id="camera-count" name="camera-count">
-                        <SelectValue placeholder="Choose amount" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        {numOfCameras.map((camera) => (
-                          <SelectItem key={camera.value} value={camera.value}>
-                            {camera.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.cameraCount && (
-                      <p className="text-sm text-rose-500">
-                        {errors.cameraCount.message}
-                      </p>
-                    )}
-                  </div> */}
-                {/* </div> */}
-
-                {/* Timeline */}
-                {/* <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="timeline">Timeline to Install</Label>
-                    <Select
-                      id="timeline" name="timeline"
-                      onValueChange={(value) => setValue("timeline", value)}
-                      value={watch("timeline")}
-                    >
-                      <SelectTrigger id="timeline" name="timeline">
-                        <SelectValue placeholder="Select timeline" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        {timeline.map((time) => (
-                          <SelectItem key={time.value} value={time.value}>
-                            {time.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.timeline && (
-                      <p className="text-sm text-rose-500">
-                        {errors.timeline.message}
-                      </p>
-                    )}
-                  </div>
-                
-                  <div className="space-y-2">
-                    <Label htmlFor="special-features">Special Features</Label>
-                    <Select 
-                      id="special-features"
-                        name="special-features"
-                    onValueChange={handleFeatureToggle}>
-                      <SelectTrigger
-                        id="special-features"
-                        name="special-features"
-                      >
-                        <SelectValue placeholder="Any priorities?" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        {features.map((feature) => (
-                          <SelectItem key={feature.value} value={feature.value}>
-                            <div className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                checked={selectedFeatures.includes(
-                                  feature.value
-                                )}
-                                readOnly
-                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                              />
-                              <span>{feature.label}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div> */}
-
-                {/* Selected Features Display */}
-                {/* {selectedFeatures.length > 0 && (
-                  <div className="space-y-2">
-                    <Label>Selected Features</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedFeatures.map((featureValue) => {
-                        const feature = features.find(
-                          (f) => f.value === featureValue
-                        );
-                        return (
-                          <Badge
-                            key={featureValue}
-                            variant="secondary"
-                            className="flex items-center gap-1"
-                          >
-                            {feature?.label}
-                            <Button
-                              size="xs"
-                              type="button"
-                              onClick={() => removeFeature(featureValue)}
-                              className="rounded-full hover:bg-transparent bg-transparent text-primary cursor-pointer"
-                              onMouseEnter={() =>
-                                setHoveredFeature(featureValue)
-                              }
-                              onMouseLeave={() => setHoveredFeature(null)}
-                            >
-                              {hoveredFeature === featureValue ? (
-                                <X className="size-3" />
-                              ) : (
-                                <CheckCheck className="size-3" />
-                              )}
-                            </Button>
-                          </Badge>
-                        );
-                      })}
+                      {/* Message */}
+                      <div className="space-y-2">
+                        <Label htmlFor="message">Message</Label>
+                        <Textarea
+                          id="message"
+                          name="message"
+                          {...register("message")}
+                          placeholder="Provide more information if you'd like..."
+                          className="min-h-[120px]"
+                        />
+                      </div>
                     </div>
-                  </div>
-                )} */}
 
-                {/* Message */}
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    {...register("message")}
-                    placeholder="Provide more information if you'd like..."
-                    className="min-h-[120px]"
-                  />
-                </div>
-              </div>
+                    <Button
+                      type="submit"
+                      className="w-full cursor-pointer mt-4"
+                      disabled={submitting}
+                    >
+                      {submitting ? "Submitting..." : "Submit"}
+                    </Button>
+                  </motion.div>
+                ) : showTimeSelection ? (
+                  <motion.div
+                    key="time-selection"
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="space-y-6"
+                  >
+                    {/* Header */}
+                    <div className="text-center space-y-2">
+                      <div className="relative h-32 w-32 mx-auto mb-4">
+                        <Image
+                          src={rep2}
+                          alt="Representative"
+                          fill
+                          className="object-cover rounded-full"
+                          priority
+                        />
+                      </div>
+                      <h2 className="text-2xl font-bold">
+                        When would you like to speak?
+                      </h2>
+                      <p className="text-muted-foreground">
+                        Choose when you'd like to receive your call
+                      </p>
+                    </div>
 
-              <Button
-                type="submit"
-                className="w-full cursor-pointer"
-                disabled={submitting}
-              >
-                {submitting ? "Submitting..." : "Submit"}
-              </Button>
+                    {/* Time Options */}
+                    <div className="space-y-3">
+                      {[
+                        {
+                          value: 0,
+                          label: "Right Now",
+                          description: "Call me immediately",
+                          icon: Phone,
+                        },
+                        {
+                          value: 5,
+                          label: "In 5 Minutes",
+                          description: "Perfect for a quick prep",
+                          icon: Clock,
+                        },
+                        {
+                          value: 30,
+                          label: "In 30 Minutes",
+                          description: "Give me some time to prepare",
+                          icon: Clock,
+                        },
+                        // { value: '1hr', label: 'In 1 Hour', description: 'I need an hour to get ready', icon: Clock }
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            let timeOption;
+                            if (option.value === 0) {
+                              timeOption = new Date().toISOString(); // Current time, rounded to minute
+                            } else {
+                              const futureTime = new Date(
+                                Date.now() + option.value * 60 * 1000
+                              );
+                              futureTime.setSeconds(0, 0); // Round to the nearest minute
+                              timeOption = futureTime.toISOString(); // Convert to ISO string
+                            }
+                            handleTimeSelection(timeOption);
+                          }}
+                          className="w-full p-4 border-2 border-muted rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-300 text-left group cursor-pointer"
+                          disabled={initiatingCall}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <option.icon className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-sm">
+                                {option.label}
+                              </h3>
+                              <p className="text-xs text-muted-foreground">
+                                {option.description}
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
 
-              {success && (
-                <div className="text-green-500 text-center">
-                  Form submitted successfully!
-                </div>
-              )}
+                    {/* Loading State */}
+                    {initiatingCall && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center space-y-2"
+                      >
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+                        <p className="text-sm text-muted-foreground">
+                          Setting up your call...
+                        </p>
+                      </motion.div>
+                    )}
+
+                    {/* Back Button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowTimeSelection(false)}
+                      className="w-full"
+                      disabled={initiatingCall}
+                    >
+                      Back to Contact Info
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="ai-call"
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="overflow-x-hidden"
+                  >
+                    {/* Mobile-first layout */}
+                    <div className="flex flex-col bg-background overflow-hidden">
+                      {/* Image Section (Full width) */}
+                      <div className="relative h-64 w-full">
+                        <Image
+                          src={rep2}
+                          alt="Representative"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/40"></div>
+                        <div className="absolute top-4 left-0 right-0 text-center">
+                          <h1 className="text-2xl font-bold text-white drop-shadow-md">
+                            Book Call Now!
+                          </h1>
+                        </div>
+                      </div>
+
+                      {/* Contact Card (Below image on mobile) */}
+                      <motion.div
+                        className="mx-4 transform -translate-y-6 z-10"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: -24, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <div className="bg-background border border-muted rounded-lg shadow-lg overflow-hidden">
+                          <div className="bg-primary px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <UserCircle className="size-5 text-primary-foreground" />
+                              <h3 className="text-primary-foreground font-medium text-sm">
+                                Contact Information
+                              </h3>
+                            </div>
+                          </div>
+
+                          <div className="p-4 space-y-3">
+                            {/* Name */}
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                Name
+                              </p>
+                              <p className="text-sm font-medium">
+                                {submittedData.firstname}{" "}
+                                {submittedData.lastname}
+                              </p>
+                            </div>
+
+                            {/* Phone */}
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                Phone
+                              </p>
+                              <p className="text-sm font-medium">
+                                {submittedData.phone}
+                              </p>
+                            </div>
+
+                            {/* Email */}
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                Email
+                              </p>
+                              <p className="text-sm font-medium truncate">
+                                {submittedData.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Buttons */}
+                      <motion.div
+                        className="px-4 pb-4 pt-2 bg-background"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <div className="space-y-2 flex flex-col">
+                          <Button
+                            type="button"
+                            onClick={() => setShowTimeSelection(true)}
+                            className="w-full gap-2 py-3 text-base"
+                          >
+                            <Phone className="size-4" />
+                            Book Call Now!
+                          </Button>
+
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setFormSubmitted(false);
+                              setSubmitting(false);
+                            }}
+                            className="w-full py-3 text-base"
+                          >
+                            Book Call Later
+                          </Button>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {error && (
-                <div className="text-rose-500 text-center">{error}</div>
+                <motion.div
+                  className="text-rose-500 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {error}
+                </motion.div>
               )}
             </div>
+
             <SuccessDialog
               open={successDialogOpen}
               onClose={() => setSuccessDialogOpen(false)}

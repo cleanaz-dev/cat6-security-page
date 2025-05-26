@@ -20,42 +20,57 @@ export async function POST(req) {
   try {
     // Parse and validate request body
     const data = await req.json();
-    const { selectedTime = 0 } = data; // Default to immediate call if not specified
-    console.log("data:", data);
+    const { timeOption, uuid } = data; // Default to immediate call if not specified
+    console.log("call request API data:", data);
 
     // Required field validation
-    if (!data?.phone || !data?.name || !data?.redisId) {
+    if (!data?.phone || !data?.firstname || !uuid) {
       return NextResponse.json({ error: "Phone, name are required" }, { status: 400 });
     }
 
     
-    // Base call data structure that will be stored in Redis
-    const callData = {
-      ...data,               
-      status: 'pending',     // Initial status
-    };
-
-    // Handle scheduled calls (selectedTime > 0)
-    if (selectedTime > 0) {
-      // Update call data for scheduled call
-      callData.status = 'scheduled';
-      callData.callTime = new Date(Date.now() + selectedTime * 60000); // Calculate future call time
-      
+    // Handle scheduled calls (timeOption > 0)
+    if (timeOption !== null) {
+    
       // Store in Redis
-      await redis.set(`redisId1${data.redisId}`,JSON.stringify(callData));
+      await redis.json.set(`callRequest:${uuid}`, '.', {
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        phone: data.phone,
+        message: data.message,
+        uuid: uuid,
+        timeOption: timeOption,
+        status: "scheduled", // for scheduled calls
+        callTime: timeOption,
+        createdAt: new Date().toISOString()
+      });
+
+      // Calculate minutes for response (optional, for logging/debugging)
+      const minutesFromNow = Math.round((timeOption - Date.now()) / 60000);
 
       // Return success response with scheduling details
       return NextResponse.json({ 
-        success: true,               // Return the call ID for reference
-        scheduledMinutes: selectedTime // When the call is scheduled for
+        success: true,               
+        scheduledMinutes: minutesFromNow,
+        scheduledTime: timeOption
       });
     }
 
-    // Handle immediate calls (selectedTime = 0)
-    callData.status = 'in_progress';  // Mark as in progress immediately
-    
-    // Store call data in Redis before initiating
-    await redis.set(`redisId1${data.redisId}`,JSON.stringify(callData));
+ 
+    // Store call data in Redis before initiating Mark as in progress immediately
+       await redis.json.set(`callRequest:${uuid}`, '.', {
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        phone: data.phone,
+        message: data.message,
+        uuid: uuid,
+        timeOption: timeOption,
+        status: "in_progress",
+        createdAt: new Date().toISOString()
+      });
+
 
     // Initiate the actual phone call through Bland AI
     const callResponse = await makeCall({ 

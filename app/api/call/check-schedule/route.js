@@ -14,33 +14,62 @@ export async function POST(req) {
 
   try {
     const now = new Date();
-    const keys = await redis.keys('scheduledCall:*');
+    const redisKeys = await redis.keys('callRequest:*');
+    console.log("Found Redis keys:", redisKeys);
 
-    for (const key of keys) {
-      const callDataStr = await redis.get(key);
-      if (!callDataStr) continue;
+    let processedCalls = 0;
+    let errors = [];
 
-      const callData = JSON.parse(callDataStr);
-      
-      // Skip if already in progress
-      if (callData.status === 'in_progress') continue;
+    for (const redisKey of redisKeys) {
+      try {
+        const callData = await redis.json.get(redisKey);
+        if (!callData) {
+          console.log(`No data found for key: ${redisKey}`);
+          continue;
+        }
+        
+        // Skip if already in progress
+        if (callData.status === 'in_progress') {
+          console.log(`Call ${redisKey} already in progress, skipping`);
+          continue;
+        }
 
-      // Handle both scheduled and call-back statuses
-      if ((callData.status === 'scheduled' || callData.status === 'call-back') && 
-          new Date(callData.callTime) <= now) {
-        // Update status only
-        await redis.set(key, JSON.stringify({
-          ...callData,
-          status: 'in_progress'
-        }));
-
-        await makeCall(callData);
+        // Only process scheduled calls
+        if (callData.status === 'scheduled' && callData.callTime) {
+          const scheduledTime = new Date(callData.callTime);
+          
+          // Check if scheduled time has passed (scheduledTime <= now)
+          if (scheduledTime <= now) {
+            console.log(`Call ${redisKey} is ready (scheduled: ${scheduledTime})`);
+            
+            // Update status to in_progress
+            await redis.json.set(redisKey, '.status', 'in_progress');
+            
+            try {
+              // Make the call
+              await makeCall(callData);
+              processedCalls++;
+              console.log(`Successfully initiated call for ${redisKey}`);
+            } catch (callError) {
+              console.error(`Failed to make call for ${redisKey}:`, callError);
+              // Reset status back to scheduled if call fails
+              await redis.json.set(redisKey, '.status', 'scheduled');
+              errors.push({ key: redisKey, error: callError.message });
+            }
+          }
+        }
+      } catch (keyError) {
+        console.error(`Error processing key ${redisKey}:`, keyError);
+        errors.push({ key: redisKey, error: keyError.message });
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: "Call processing completed"
+      message: "Call processing completed",
+      processedCalls,
+      totalKeys: redisKeys.length,
+      errors: errors.length > 0 ? errors : undefined
     });
 
   } catch (error) {
