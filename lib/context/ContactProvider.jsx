@@ -157,7 +157,7 @@ function getNoteType(noteBody) {
     const handleRefresh = async (contactEmail, refresh = false) => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/test/hubspot/logs`, {
+        const response = await fetch(`/api/logs`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

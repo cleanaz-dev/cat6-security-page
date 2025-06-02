@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
     "@clerk/backend": "^1.31.3",
     "@clerk/nextjs": "^6.18.4",
     "@fullcalendar/core": "^6.1.17",
@@ -31,6 +32,7 @@
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.0",
     "@radix-ui/react-switch": "^1.2.2",
+    "@radix-ui/react-tabs": "^1.1.12",
     "@tanstack/react-table": "^8.21.3",
     "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.9.0",

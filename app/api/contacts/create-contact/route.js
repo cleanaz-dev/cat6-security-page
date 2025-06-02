@@ -4,7 +4,9 @@ import { addOrUpdateContact } from "@/lib/hubspot"
 export async function POST(req) {
   try {
     const data = await req.json()
-    // const response = await addOrUpdateContact(data)
+    await addOrUpdateContact(data)
+
+    
 
     return NextResponse.json({ success: true })
   } catch (error) {

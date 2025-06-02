@@ -9,7 +9,7 @@ import { uploadPdfToCloudinary } from '@/lib/cloudinary';
 export async function POST(request) {
   try {
     const { products, contactData } = await request.json();
-    console.log(" products: ", products)
+    console.log(" contactData: ", contactData)
  
     
     // Validate input
@@ -73,16 +73,14 @@ export async function POST(request) {
     })  
 
     await createNote({
-      contactId: contact.id,
+      contactId: contact.contactId,
       body: `Quote created total: $${total}. View the quote at: View Quote (ID:${quoteId})`
     });
     
 
 
     return NextResponse.json({
-      success: true,
-      quoteId,
-      quoteUrl: url
+      success: true
     });
   } catch (error) {
     console.error("Error creating invoice:", error.stack);

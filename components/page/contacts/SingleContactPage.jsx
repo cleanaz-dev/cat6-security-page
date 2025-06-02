@@ -11,13 +11,13 @@ import {
   Info,
   Clock,
   Loader2,
+  RefreshCcw,
+  MapPin,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-
 import Link from "next/link";
 import { useContact } from "@/lib/context/ContactProvider";
 import { Label } from "@/components/ui/label";
-import { RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SingleContactPage({ contactId }) {
@@ -48,7 +48,7 @@ export default function SingleContactPage({ contactId }) {
   });
 
   if (!contact) {
-    return null
+    return null;
   }
 
   return (
@@ -64,27 +64,40 @@ export default function SingleContactPage({ contactId }) {
       {/* Main Contact Card */}
       <Card>
         <CardContent>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <Avatar className="h-20 w-20 text-primary md:block hidden">
-              <AvatarImage src="/" />
-              <AvatarFallback>
-                <User />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-lg md:text-2xl font-bold ">
-                {contact.firstname}
-              </h1>
-              <div className="mt-2 space-y-1">
-                <p className="flex gap-2 items-center text-muted-foreground text-sm md:text-base">
-                  <Mail className="size-5 text-primary-muted" />
-                  {contact.email}
-                </p>
-                <p className="flex gap-2 items-center text-muted-foreground text-sm md:text-base">
-                  <Phone className="size-5 text-primary-muted" />
-                  {contact.phone}
-                </p>
+          <div className="flex flex-col justify-between gap-6">
+            {/* Top row with contact info */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+              <div className="flex gap-6">
+                <Avatar className="h-20 w-20 text-primary md:block hidden">
+                  <AvatarImage src="/" />
+                  <AvatarFallback>
+                    <User />
+                  </AvatarFallback>
+                </Avatar>
+
+                <div>
+                  <h1 className="text-lg md:text-2xl font-bold">
+                    {contact.firstname}
+                  </h1>
+                  <div className="mt-2 space-y-1">
+                    <p className="flex gap-2 items-center text-muted-foreground text-sm md:text-base">
+                      <Mail className="size-5 text-primary-muted" />
+                      {contact.email}
+                    </p>
+                    <p className="flex gap-2 items-center text-muted-foreground text-sm md:text-base">
+                      <Phone className="size-5 text-primary-muted" />
+                      {contact.phone}
+                    </p>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            {/* Bottom row with timeline button aligned right */}
+            <div className="flex justify-end w-full">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/contacts/${contactId}/timeline`}>Timeline</Link>
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -152,24 +165,70 @@ export default function SingleContactPage({ contactId }) {
           </div>
         </CardContent>
       </Card>
+      {/*  */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <span className="flex gap-2 items-center">
+              <Info className="text-primary" />
+              <h1 className="text-lg md:text-2xl">Install Details</h1>
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Install Date */}
+            <div className="flex flex-col p-4 bg-muted/50">
+              <div className="flex justify-between items-center">
+                <Label className="text-lg md:text-xl">Install Date</Label>
+              </div>
+              <p className="mt-1 font-medium text-primary"></p>
+            </div>
+
+            {/* Warranty */}
+            <div className="flex flex-col p-4 bg-muted/50">
+              <div className="flex justify-between items-center">
+                <Label className="text-lg md:text-xl">Warranty</Label>
+              </div>
+              <p className="mt-1 font-medium text-primary"></p>
+            </div>
+
+            {/* Subscriptions */}
+            <div className="flex flex-col p-4 bg-muted/50">
+              <div className="flex justify-between items-center">
+                <Label className="text-lg md:text-xl">Subscriptions</Label>
+              </div>
+              <p className="mt-1 font-medium text-primary"></p>
+            </div>
+
+            {/* Hardware */}
+            <div className="col-span-full p-4 bg-muted/50">
+              <div className="flex justify-between items-center">
+                <Label className="text-lg md:text-xl">Hardware</Label>
+              </div>
+              <p className="mt-1 font-medium text-primary"></p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Activity Card */}
       <Card>
         <CardHeader>
           <CardTitle className="">
             <div className="flex justify-between items-center">
-              <div className="flex items-start gap-2">
-                <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary mt-1.5" />
-                <div>
-                  <h1 className="text-lg md:text-2xl">Client Activity Log</h1>
-                  {updatedAt && (
-                    <p className="text-xs md:text-sm text-muted-foreground font-light">
-                      Last updated:{" "}
-                     {formattedUpdatedAt}
-                    </p>
-                  )}
-                </div>
+              <div>
+                <h1 className="flex items-center gap-2 text-lg md:text-2xl">
+                  <Clock className="text-primary" />
+                  Client Activity Log
+                </h1>
+                {updatedAt && (
+                  <p className="text-xs md:text-sm text-muted-foreground font-light">
+                    Last updated: {formattedUpdatedAt}
+                  </p>
+                )}
               </div>
+
               <div>
                 <button
                   onClick={handleRefreshClick}
@@ -186,16 +245,14 @@ export default function SingleContactPage({ contactId }) {
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="space-y-2">
-                  {/* Title Skeleton (shorter, 60% width) */}
                   <Skeleton className="h-4 w-[60%] rounded" />
-                  {/* Body Skeleton (full width, taller) */}
                   <Skeleton className="h-5 w-full rounded" />
                 </div>
               ))
             ) : activities.length === 0 ? (
-              <span className="text-center h-24">
-                <Loader2 className="animate-spin" />
-              </span>
+              <div className="flex items-center justify-center h-24 text-sm text-muted-foreground">
+                No activity yet.
+              </div>
             ) : (
               activities.map((act) => renderActivityLog(act))
             )}

@@ -5,21 +5,24 @@ export const useProductCategories = (products) => {
     ip: [],
     cable: [],
     nvr: [],
+    kits: [],
     install: [],
-    misc: []
+    misc: [],
   };
 
-  products.forEach(product => {
+  products.forEach((product) => {
     const name = product.name.toLowerCase();
-    
-    if (name.startsWith('ip')) {
+
+    if (name.startsWith("ip")) {
       categories.ip.push(product);
-    } else if (name.startsWith('cable')) {
+    } else if (name.startsWith("cable")) {
       categories.cable.push(product);
-    } else if (name.startsWith('nvr')) {
+    } else if (name.startsWith("nvr")) {
       categories.nvr.push(product);
-    } else if (name.startsWith('install')) {
+    } else if (name.startsWith("install")) {
       categories.install.push(product);
+    } else if (name.startsWith("kit")) {
+      categories.kits.push(product);
     } else {
       categories.misc.push(product);
     }
@@ -30,17 +33,18 @@ export const useProductCategories = (products) => {
     .map(([category, items]) => ({
       category,
       items,
-      title: getCategoryTitle(category)
+      title: getCategoryTitle(category),
     }));
 };
 
 const getCategoryTitle = (category) => {
   const titles = {
-    ip: 'IP Cameras & Accessories',
-    cable: 'Cables',
-    nvr: 'NVR Systems',
-    install: 'Installation Services',
-    misc: 'Other Products'
+    ip: "IP Cameras & Accessories",
+    cable: "Cables",
+    nvr: "NVR Systems",
+    kits: "NVR Kits",
+    install: "Installation Services",
+    misc: "Other Products",
   };
   return titles[category] || category;
 };

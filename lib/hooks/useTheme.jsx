@@ -68,7 +68,7 @@ export const NavThemeChanger = () => {
         } transition-colors `}
         onClick={() => setTheme("light")}
       >
-        <Sun className="group-hover:rotate-180 transition-all duration-200"/>
+        <Sun className="group-hover:rotate-180 transition-all duration-500"/>
       </button>
       <button
         className={`rounded-full cursor-pointer group  ${
@@ -78,7 +78,7 @@ export const NavThemeChanger = () => {
         } transition-colors `}
         onClick={() => setTheme("dark")}
       >
-        <Moon className="group-hover:rotate-180 transition-all duration-200"/>
+        <Moon className="group-hover:rotate-360 transition-all duration-500"/>
       </button>
     </div>
   );

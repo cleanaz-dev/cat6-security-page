@@ -43,8 +43,6 @@ export async function POST(req) {
     // console.log("first time activity fetch:", payload);
 
     await redis.set(cacheKey, JSON.stringify(payload), { ex: 60 * 60 });
-    // console.log("payload", payload)
-
     return NextResponse.json(payload);
   } catch (error) {
     console.error("Error fetching contact activity:", error);
